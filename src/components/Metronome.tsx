@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Box, Slider, Typography } from "@mui/material";
 import * as Tone from 'tone';
-// import tickSound from "../assets/Synth_Sine_C_lo.wav";
-// import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
+import tickSound from "../assets/Synth_Sine_C_lo.wav";
+import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
 
 
 const Metronome = () => {
@@ -15,6 +15,16 @@ const Metronome = () => {
   //   player.start(time).stop(time + 0.1);
   // }, "4n");
 
+  const sampler = new Tone.Sampler({
+    urls: {
+      C3: tickSound,
+      C4: tickSoundDown,
+    },
+    // baseUrl: "https://tonejs.github.io/audio/casio/",
+    // onload: () => {
+    //   sampler.triggerAttackRelease(["C1", "E1", "G1", "B1"], 0.5);
+    // }
+  }).toDestination();
   const synthA = new Tone.Synth().toDestination();
 
   // const loopA = new Tone.Loop(time => {
@@ -28,9 +38,9 @@ const Metronome = () => {
   // }, "4n").start(0);
 
   const seq = new Tone.Sequence((time, note) => {
-    synthA.triggerAttackRelease(note, "32n", time);
-    // playerDown.start(time);
-  }, ["A4", "A3", "A3", "A3"], "16n").start(0);
+    sampler.triggerAttackRelease(note, "32n", time);
+    // synthA.triggerAttackRelease(note, "32n", time);
+  }, ["C4", "C3", "C3", "C3"], "16n").start(0);
   Tone.Transport.bpm.value = beat;
   Tone.Transport.start();
 
