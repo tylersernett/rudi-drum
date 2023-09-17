@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import Metronome from './components/Metronome';
+import Toney from './components/Toney';
 
 function App() {
   const [countL, setCountL] = useState(0);
@@ -35,16 +36,17 @@ function App() {
         </a>
       </div>
 
-      
+
       <h1>Rudi</h1>
       <div className="card">
-        <button onClick={() => setCountL((count) => count + 1)}>
+        <div onClick={() => setCountL((count) => count + 1)}>
           Left: {countL}
-        </button>
-        <button onClick={() => setCountR((count) => count + 1)}>
+        </div>
+        <div onClick={() => setCountR((count) => count + 1)}>
           Right: {countR}
-        </button>
+        </div>
         <Metronome />
+        {/* <Toney/> */}
       </div>
     </>
   );

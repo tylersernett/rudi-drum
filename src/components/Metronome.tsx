@@ -1,40 +1,50 @@
 import React, { useState, useEffect } from "react";
-import Slider from "@mui/material/Slider";
-import { Box, Typography } from "@mui/material";
-import tickSound from '../assets/Synth_Sine_C_lo.wav';
+import { Box, Slider, Typography } from "@mui/material";
+import * as Tone from 'tone';
+// import tickSound from "../assets/Synth_Sine_C_lo.wav";
+// import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
+
 
 const Metronome = () => {
   const [beat, setBeat] = useState(120);
   const [isBlinking, setIsBlinking] = useState(false);
-  const [isSoundReady, setIsSoundReady] = useState(false); // New state to track audio readiness
+  // const player = new Tone.Player(tickSound).toDestination();
+  // const playerDown = new Tone.Player(tickSoundDown).toDestination();
 
-  useEffect(() => {
-    let intervalId;
+  // let repeat = Tone.Transport.scheduleRepeat((time) => {
+  //   player.start(time).stop(time + 0.1);
+  // }, "4n");
 
-    const startBlinking = () => {
-      intervalId = setInterval(() => {
-        setIsBlinking(true);
-        if (isSoundReady) {
-          // audioRef.current.play(); // Play the sound when it's ready
-          const audio1 = document.getElementById("click");
-          audio1.play();
-        }
-        setTimeout(() => {
-          setIsBlinking(false);
-        }, 100); // Adjust this value to control the blink duration
-      }, (60 / beat) * 1000); // Calculate the interval based on the BPM
-    };
+  const synthA = new Tone.Synth().toDestination();
 
-    startBlinking();
+  // const loopA = new Tone.Loop(time => {
+  //   // synthA.triggerAttackRelease("C2", "8n", time);
+  //   player.start(time);
+  // }, "16n").start(0);
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [beat]);
+  // const loopB = new Tone.Loop(time => {
+  //   // synthA.triggerAttackRelease("C2", "8n", time);
+  //   playerDown.start(time);
+  // }, "4n").start(0);
 
-  const handleSliderChange = (event, newValue) => {
-    setBeat(newValue);
-  };
+  const seq = new Tone.Sequence((time, note) => {
+    synthA.triggerAttackRelease(note, "32n", time);
+    // playerDown.start(time);
+  }, ["A4", "A3", "A3", "A3"], "16n").start(0);
+  Tone.Transport.bpm.value = beat;
+  Tone.Transport.start();
+
+  function start() {
+    Tone.Transport.start();
+  }
+  function stop() {
+    Tone.Transport.stop();
+  }
+
+  // setIsBlinking(true);
+  // setTimeout(() => {
+  //   setIsBlinking(false);
+  // }, 100); // Adjust this value to control the blink duration
 
   const squareStyle = {
     width: "50px",
@@ -47,23 +57,51 @@ const Metronome = () => {
     backgroundColor: "white",
   };
 
-  const audioRef = React.createRef(); // Create a reference to the audio element
-  const handleAudioReady = () => {
-    setIsSoundReady(true); // Set the audio readiness flag when it's ready
+  const handleSliderChange = (event: Event, newValue: number) => {
+    // stop()
+    // loopA.cancel()
+    // loopB.cancel()
+    Tone.Transport.cancel();
+    // Tone.Transport.stop()
+    // Tone.Transport.dispose()
+    // new Tone.Transport
+    // repeat = undefined;
+    setBeat(newValue);
+    setTimeout(() => {
+      Tone.Transport.bpm.setValueAtTime(newValue, Tone.Transport.now())
+    }, 1000)
   };
+
+  useEffect(() => {
+    const buttonElement = document.querySelector('button');
+    if (buttonElement) {
+      const clickHandler = async () => {
+        await Tone.start();
+        console.log('audio is ready');
+      };
+      buttonElement.addEventListener('click', clickHandler);
+
+      return () => {
+        buttonElement.removeEventListener('click', clickHandler);
+      };
+    }
+  }, []);
+
+
   return (
     <div className="metronome">
       <div style={{ ...squareStyle, ...(isBlinking ? blinkStyle : {}) }} />
       <Slider
         min={60}
-        max={200}
+        max={256}
         value={beat}
         onChange={handleSliderChange}
       />
       <Box mt={2}>
         <Typography variant="body2">Beats per Minute (BPM): {beat}</Typography>
       </Box>
-      <audio id={'click'} ref={audioRef} src={tickSound} preload="auto" onCanPlay={handleAudioReady} />
+      <button onClick={() => start()}>Start</button>
+      <button onClick={() => stop()}>Stop</button>
     </div>
   );
 };
