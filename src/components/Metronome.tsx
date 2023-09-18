@@ -4,11 +4,16 @@ import * as Tone from 'tone';
 import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
 
-const BlinkingSquare = ({ isBlinking }) => {
+interface BlinkingSquareProps {
+  isBlinking: boolean;
+}
+
+const BlinkingSquare: React.FC<BlinkingSquareProps> = ({ isBlinking }) => {  
   const squareStyle = {
     width: "50px",
     height: "50px",
-    backgroundColor: isBlinking ? "gray" : "white",
+    backgroundColor: isBlinking ? "lightgray" : "orange",
+    borderRadius: '100%'
     // transition: "background-color 0.2s ease-in-out",
   };
 
@@ -18,15 +23,6 @@ const BlinkingSquare = ({ isBlinking }) => {
 const Metronome = () => {
   const [beat, setBeat] = useState(120);
   const [isBlinking, setIsBlinking] = useState(false);
-  // const playerDown = new Tone.Player(tickSoundDown).toDestination();
-
-  // let repeat = Tone.Transport.scheduleRepeat((time) => {
-  //   sampler.triggerAttackRelease("c4", "32n", time);
-  // }, "4n");
-
-  // const seq = new Tone.Sequence((time, note) => {
-  //   sampler.triggerAttackRelease(note, "32n", time);
-  // }, ["C4", "C3", "C3", "C3"], "16n").stop();
 
   // useEffect( () => {
   //   // Create audio components and set up scheduling only once
@@ -69,48 +65,14 @@ const Metronome = () => {
     },
   }).toDestination();
 
-  // const synthA = new Tone.Synth().toDestination();
-
-  // const loopA = new Tone.Loop(time => {
-  //   // synthA.triggerAttackRelease("C2", "8n", time);
-  //   player.start(time);
-  // }, "16n").start(0);
-
-  // const loopB = new Tone.Loop(time => {
-  //   // synthA.triggerAttackRelease("C2", "8n", time);
-  //   playerDown.start(time);
-  // }, "4n").start(0);
-
-  // const seq = new Tone.Sequence((time, note) => {
-  //   sampler.triggerAttackRelease(note, "32n", time);
-  //   // synthA.triggerAttackRelease(note, "32n", time);
-  // }, ["C4", "C3", "C3", "C3"], "16n").start(0);
-  // Tone.Transport.bpm.value = beat;
-
-
-  // Tone.Transport.start();
-
-  // Tone.Transport.schedule((time) => {
-  //   // use the time argument to schedule a callback with Draw
-  //   Tone.Draw.schedule(() => {
-  //     // do drawing or DOM manipulation here
-  //     console.log(time);
-  //   }, time);
-  // }, "1m");
-  // Tone.Transport.start();
-  // Tone.Transport.scheduleRepeat(time => {
-  //   Tone.Draw.schedule(() => setIsBlinking(true), time);
-  //   Tone.Draw.schedule(() => setIsBlinking(false), time + 1);
-  // }, '4n');
-
-  function start() {
-    const seq = new Tone.Sequence((time, note) => {
+  async function start() {
+    const seq = await new Tone.Sequence((time, note) => {
       sampler.triggerAttackRelease(note, "32n", time);
     }, ["C4", "C3", "C3", "C3"], "16n").stop();
 
+    seq.start();
     Tone.Transport.scheduleRepeat((time) => {
       setIsBlinking(false);
-      seq.start();
       // sampler.triggerAttackRelease("C4", "16n", time);
       Tone.Draw.schedule(() => setIsBlinking(true), time);
     }, "4n");
@@ -126,14 +88,17 @@ const Metronome = () => {
     Tone.Transport.stop();
   }
 
-  const handleSliderChange = (event: Event, newValue: number) => {
-    stop()
+  const handleSliderChange = (newValue: number) => {
     setBeat(newValue);
-    setTimeout(() => {
-      Tone.Transport.bpm.setValueAtTime(newValue, Tone.Transport.now())
-    }, 1000)
-    start()
   };
+
+  const handleSliderCommit = (newValue: number) => {
+    stop()
+    setTimeout(() => {
+      Tone.Transport.bpm.setValueAtTime(newValue, Tone.Transport.immediate())
+    }, 100)
+    start()
+  }
 
   useEffect(() => {
     const buttonElement = document.querySelector('button');
@@ -161,6 +126,7 @@ const Metronome = () => {
         max={256}
         value={beat}
         onChange={handleSliderChange}
+        onChangeCommitted={handleSliderCommit}
       />
       <Box mt={2}>
         <Typography variant="body2">Beats per Minute (BPM): {beat}</Typography>
