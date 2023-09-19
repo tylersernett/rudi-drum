@@ -1,5 +1,5 @@
 // import { useState, useEffect, useMemo, useRef } from "react";
-import * as Tone from 'tone';
+// import * as Tone from 'tone';
 
 interface BlinkingSquareProps {
   isBlinking: boolean;
@@ -16,8 +16,10 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
   };
 
   if (isBlinking) {
+    setTimeout(() => {
+      setIsBlinking(false)
+    }, 60);
     // Tone.Draw.schedule(() => setIsBlinking(false), Tone.now() +Tone.Time("32n").toSeconds());
-    Tone.Draw.schedule(() => setIsBlinking(false), Tone.now());
   }
 
   return <div id='sq' style={squareStyle} />;
