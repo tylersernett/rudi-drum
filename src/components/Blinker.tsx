@@ -1,9 +1,11 @@
 // import { useState, useEffect, useMemo, useRef } from "react";
 // import * as Tone from 'tone';
+import { Dispatch, SetStateAction } from "react";
+import { Box } from "@mui/material";
 
 interface BlinkingSquareProps {
   isBlinking: boolean;
-  setIsBlinking: (isBlinking: boolean) => void;
+  setIsBlinking: Dispatch<SetStateAction<boolean>>;
 }
 
 const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) => {
@@ -22,7 +24,14 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
     // Tone.Draw.schedule(() => setIsBlinking(false), Tone.now() +Tone.Time("32n").toSeconds());
   }
 
-  return <div id='sq' style={squareStyle} />;
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+    >
+      <div id='sq' style={squareStyle} />
+    </Box>
+  )
 };
 
 export default Blinker
