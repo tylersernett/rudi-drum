@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import Metronome from './components/Metronome';
 import Toney from './components/Toney';
+import { Box, Typography } from '@mui/material';
 
 function App() {
   const [countL, setCountL] = useState(0);
@@ -27,26 +28,24 @@ function App() {
 
   return (
     <>
-      <div>
+      {/* <Box mt={-3}>
         <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
         <a href="https://react.dev" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
-      </div>
+      </Box> */}
 
-
-      <h1>Rudi</h1>
+      <Typography mb={-2} variant='h1'>rudi</Typography>
       <div className="card">
-        <div onClick={() => setCountL((count) => count + 1)}>
+        <span onClick={() => setCountL((count) => count + 1)}>
           Left: {countL}
-        </div>
-        <div onClick={() => setCountR((count) => count + 1)}>
+        </span>&nbsp;|&nbsp;
+        <span onClick={() => setCountR((count) => count + 1)}>
           Right: {countR}
-        </div>
+        </span>
         <Metronome />
-        {/* <Toney/> */}
       </div>
     </>
   );

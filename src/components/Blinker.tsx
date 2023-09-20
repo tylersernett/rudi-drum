@@ -28,6 +28,7 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
     <Box
       display="flex"
       justifyContent="center"
+      mt={2}
     >
       <div id='sq' style={squareStyle} />
     </Box>

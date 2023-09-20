@@ -1,5 +1,7 @@
 import { useEffect,  Dispatch, SetStateAction } from "react";
 import { Box, Typography, Button } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import * as Tone from 'tone';
 
 interface SubdivisionCounterProps {
@@ -28,8 +30,8 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ subdivisions, s
 
   return (
     <Box mt={2}>
-      <Button variant="outlined" onClick={() => incrementSubdivisions(-1)} disabled={subdivisions === subMin}>–</Button>
-      <Button variant="outlined" onClick={() => incrementSubdivisions(1)} disabled={subdivisions === subMax}>+</Button>
+      <Button variant="outlined" onClick={() => incrementSubdivisions(-1)} disabled={subdivisions === subMin}><RemoveIcon/></Button>
+      <Button variant="outlined" onClick={() => incrementSubdivisions(1)} disabled={subdivisions === subMax}><AddIcon/></Button>
       <Typography variant="body1">
         subdivisions: {subdivisions}
       </Typography>
