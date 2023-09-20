@@ -10,9 +10,10 @@ interface SubCounterProps {
   setSubdivisions: Dispatch<SetStateAction<number>>;
   stop: () => void;
   start: () => void;
+  restartSequence: (restartTime: number) => void;
 }
 
-const SubCounter: React.FC<SubCounterProps> = ({ subdivisions, setSubdivisions, stop, start }) => {
+const SubCounter: React.FC<SubCounterProps> = ({ subdivisions, setSubdivisions, stop, start, restartSequence }) => {
   const subMin = 1
   const subMax = 8
   const incrementSubdivisions = (val: number): void => {
@@ -23,14 +24,30 @@ const SubCounter: React.FC<SubCounterProps> = ({ subdivisions, setSubdivisions, 
   // Use useEffect to listen for changes in subdivisions
   useEffect(() => {
     if (Tone.Transport.state === "started") {
+      // console.log(Tone.Transport.now(), Tone.Transport.nextSubdivision("4n"))
+      // const restartTime = Tone.Transport.nextSubdivision("4n")
+      // Tone.Transport.stop();
+      // Tone.Transport.cancel(restartTime);
+      // restartSequence(restartTime+.1);
+      // Tone.Transport.start(restartTime+0.2);
       stop();
+      start();
+      // Tone.Transport.stop(stopTime)
 
       // Use setTimeout to ensure the state has updated before calling start
       // setTimeout(() => {
-        start();
-      // }, 0); // Delay of 0 milliseconds
+
+      // Tone.Transport.scheduleOnce(() => {
+      //   Tone.Transport.cancel();
+      //   Tone.Transport.stop();
+      //   restartSequence();
+      //   Tone.Transport.start();
+      // }, restartTime);
+
+      // Tone.Transport.schedule(() => Tone.Transport.start(), restartTime + .1);
+
     }
-  }, [subdivisions, ]);
+  }, [subdivisions,]);
 
   return (
     <Box>
@@ -64,35 +81,27 @@ const Metronome = () => {
     Tone.context.lookAhead = 0.2
   }, [])
 
+  const restartSequence = (restartTime = 0) => {
+    const notePrefix = 4 * subdivisions;
+    const noteString = `${notePrefix}n`; //4n for quarter, 8n for eights, 12n for triplets, 16n for sixteenths, etc
+    const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3");
+    const seq = new Tone.Sequence((time, note) => {
+      if (sampler.current) {
+        sampler.current.triggerAttackRelease(note, "32n", time);
+      }
+    }, ["C4", ...subDivNotes], noteString).start(restartTime);
+
+    Tone.Transport.scheduleRepeat((time) => {
+      // sampler.triggerAttackRelease("C4", "16n", time);
+      Tone.Draw.schedule(() => setIsBlinking(true), time);
+    }, "4n");
+
+  }
+
   function start() {
     if (Tone.Transport.state !== "started") {
 
-      let noteString = "4n";
-      switch (subdivisions) {
-        case 1:
-          break;
-        case 2:
-          noteString = "8n";
-          break;
-        case 3:
-          noteString = "8t";
-          break;
-        case 4:
-          noteString = "16n";
-          break;
-      }
-      const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3");
-
-      const seq = new Tone.Sequence((time, note) => {
-        if (sampler.current) {
-          sampler.current.triggerAttackRelease(note, "32n", time);
-        }
-      }, ["C4", ...subDivNotes], noteString).start();
-
-      Tone.Transport.scheduleRepeat((time) => {
-        // sampler.triggerAttackRelease("C4", "16n", time);
-        Tone.Draw.schedule(() => setIsBlinking(true), time);
-      }, "4n");
+      restartSequence();
 
       Tone.Transport.start();
     }
@@ -137,7 +146,7 @@ const Metronome = () => {
 
   return (
     <div className="metronome">
-      <SubCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} stop={stop} start={start} />
+      <SubCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} stop={stop} start={start} restartSequence={restartSequence} />
       <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
       <Slider
         min={60}
