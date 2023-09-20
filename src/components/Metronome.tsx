@@ -4,61 +4,7 @@ import * as Tone from 'tone';
 import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
 import Blinker from "./Blinker";
-
-interface SubCounterProps {
-  subdivisions: number;
-  setSubdivisions: Dispatch<SetStateAction<number>>;
-  stop: () => void;
-  start: () => void;
-  restartSequence: (restartTime: number) => void;
-}
-
-const SubCounter: React.FC<SubCounterProps> = ({ subdivisions, setSubdivisions, stop, start, restartSequence }) => {
-  const subMin = 1
-  const subMax = 8
-  const incrementSubdivisions = (val: number): void => {
-    const newValue = Math.min(Math.max(subdivisions + val, subMin), subMax);
-    setSubdivisions(newValue);
-  };
-
-  // Use useEffect to listen for changes in subdivisions
-  useEffect(() => {
-    if (Tone.Transport.state === "started") {
-      // console.log(Tone.Transport.now(), Tone.Transport.nextSubdivision("4n"))
-      // const restartTime = Tone.Transport.nextSubdivision("4n")
-      // Tone.Transport.stop();
-      // Tone.Transport.cancel(restartTime);
-      // restartSequence(restartTime+.1);
-      // Tone.Transport.start(restartTime+0.2);
-      stop();
-      start();
-      // Tone.Transport.stop(stopTime)
-
-      // Use setTimeout to ensure the state has updated before calling start
-      // setTimeout(() => {
-
-      // Tone.Transport.scheduleOnce(() => {
-      //   Tone.Transport.cancel();
-      //   Tone.Transport.stop();
-      //   restartSequence();
-      //   Tone.Transport.start();
-      // }, restartTime);
-
-      // Tone.Transport.schedule(() => Tone.Transport.start(), restartTime + .1);
-
-    }
-  }, [subdivisions,]);
-
-  return (
-    <Box>
-      <Button onClick={() => incrementSubdivisions(-1)} disabled={subdivisions === subMin}>–</Button>
-      <Button onClick={() => incrementSubdivisions(1)} disabled={subdivisions === subMax}>+</Button>
-      <Typography>
-        subdivisions: {subdivisions}
-      </Typography>
-    </Box>
-  );
-};
+import SubdivisionCounter from "./SubdivisionCounter";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
@@ -146,7 +92,7 @@ const Metronome = () => {
 
   return (
     <div className="metronome">
-      <SubCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} stop={stop} start={start} restartSequence={restartSequence} />
+      <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} stop={stop} start={start} restartSequence={restartSequence} />
       <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
       <Slider
         min={60}
@@ -155,11 +101,13 @@ const Metronome = () => {
         onChange={handleSliderChange}
         onChangeCommitted={handleSliderCommit}
       />
-      <Box mt={2}>
-        <Typography variant="body2">Beats per Minute (BPM): {beat}</Typography>
+      <Box mt={1}>
+        <Typography variant="body1">Beats per Minute (BPM): {beat}</Typography>
       </Box>
-      <button id='starter' onClick={() => start()} disabled={!isLoaded}>Start</button>
-      <button onClick={() => stop()}>Stop</button>
+      <Box mt={2}>
+        <Button variant='contained' id='starter' onClick={() => start()} disabled={!isLoaded}>Start</Button>
+        <Button variant='contained' onClick={() => stop()}>Stop</Button>
+      </Box>
     </div>
   );
 };
