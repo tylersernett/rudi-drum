@@ -3,6 +3,8 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { Box, Switch, Typography } from "@mui/material";
 
+type Visibility = "visible" | "hidden";
+
 interface BlinkingSquareProps {
   isBlinking: boolean;
   setIsBlinking: Dispatch<SetStateAction<boolean>>;
@@ -16,9 +18,11 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
     height: "50px",
     backgroundColor: isBlinking ? "orange" : "lightgray",
     borderRadius: '100%',
-    visibility: blinkToggle ? "visible" : "hidden",
+    visibility: blinkToggle ? "visible" : "hidden" as Visibility, // Cast to Visibility
     // transition: "background-color 0.2s ease-in-out",
   };
+
+  //BUG: seems to lose sync with 5 or 7 subdivision?
 
   if (isBlinking) {
     setTimeout(() => {
@@ -38,11 +42,11 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
         onChange={handleToggleChange}
         color="primary"
       />
-      <Typography>Blink Toggle: {blinkToggle ? 'On' : 'Off'}</Typography>
+      <Typography>Blink: {blinkToggle ? 'On' : 'Off'}</Typography>
       <Box
         display="flex"
         justifyContent="center"
-        // mt={2}
+      // mt={2}
       >
         <div id='sq' style={squareStyle} />
       </Box>
