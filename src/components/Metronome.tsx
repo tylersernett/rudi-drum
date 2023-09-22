@@ -11,7 +11,10 @@ const Metronome = () => {
   const [beat, setBeat] = useState(120);
   const [subdivisions, setSubdivisions] = useState(1);
   const sampler = useRef<Tone.Sampler | null>(null);
+  const sequence = useRef<Tone.Sequence | null>(null);
   const [isBlinking, setIsBlinking] = useState(false);
+
+  //put sequence in a ref, then cancel it? and use quantization @4n
 
   useEffect(() => {
     sampler.current = new Tone.Sampler({
@@ -24,24 +27,22 @@ const Metronome = () => {
         Tone.Transport.bpm.value = beat
       }
     }).toDestination();
-    Tone.context.lookAhead = 0.2
+
+    // restartSequence();
   }, [])
 
   const restartSequence = (restartTime = 0) => {
-    const notePrefix = 4 * subdivisions;
-    const noteString = `${notePrefix}n`; //4n for quarter, 8n for eights, 12n for triplets, 16n for sixteenths, etc
     const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3");
-    const seq = new Tone.Sequence((time, note) => {
+    sequence.current = new Tone.Sequence((time, note) => {
       if (sampler.current) {
         sampler.current.triggerAttackRelease(note, "32n", time);
+        // Tone.Draw.schedule(() => setIsBlinking(true), time); //this will blink EVERY subdivision
       }
-    }, ["C4", ...subDivNotes], noteString).start(restartTime);
+    }, [["C4", ...subDivNotes]], "4n").start(restartTime);
 
     Tone.Transport.scheduleRepeat((time) => {
-      // sampler.triggerAttackRelease("C4", "16n", time);
       Tone.Draw.schedule(() => setIsBlinking(true), time);
     }, "4n");
-
   }
 
   function start() {
@@ -95,7 +96,7 @@ const Metronome = () => {
       <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} stop={stop} start={start} restartSequence={restartSequence} />
       <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
       <Slider
-        min={60}
+        min={20}
         max={256}
         value={beat}
         onChange={handleSliderChange}

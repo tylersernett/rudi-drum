@@ -22,8 +22,6 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
     // transition: "background-color 0.2s ease-in-out",
   };
 
-  //BUG: seems to lose sync with 5 or 7 subdivision?
-
   if (isBlinking) {
     setTimeout(() => {
       setIsBlinking(false)
