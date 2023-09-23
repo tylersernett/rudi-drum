@@ -32,6 +32,7 @@ const Metronome = () => {
   }, [])
 
   const restartSequence = (restartTime = 0) => {
+    Tone.Transport.cancel();
     const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3");
     sequence.current = new Tone.Sequence((time, note) => {
       if (sampler.current) {
@@ -40,24 +41,28 @@ const Metronome = () => {
       }
     }, [["C4", ...subDivNotes]], "4n").start(restartTime);
 
+    console.log("SEQ: ", sequence.current); //sequence.current.part.events[0]
+
     Tone.Transport.scheduleRepeat((time) => {
       Tone.Draw.schedule(() => setIsBlinking(true), time);
-    }, "4n");
+      // Tone.Draw.schedule(() => setIsBlinking(true), "+8n"); //8th note later
+      console.log('DOWNBEAT: ', time)
+    }, "4n",restartTime );
   }
 
   function start() {
     if (Tone.Transport.state !== "started") {
 
-      restartSequence();
-
+      
       Tone.Transport.start();
     }
+    restartSequence();
   }
 
   function stop() {
     setIsBlinking(false);
     Tone.Transport.cancel(); //??? cancel vs stop vs dispose?
-    Tone.Transport.stop();
+    // Tone.Transport.stop();
   }
 
   const handleSliderChange = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
