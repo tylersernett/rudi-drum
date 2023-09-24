@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { Box, Slider, Typography, Button } from "@mui/material";
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
 import * as Tone from 'tone';
 import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
 import Blinker from "./Blinker";
 import SubdivisionCounter from "./SubdivisionCounter";
 import Grader from "./Grader";
+import PlayPause from "./PlayPause";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
@@ -16,7 +15,6 @@ const Metronome = () => {
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
   const [isBlinking, setIsBlinking] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   //put sequence in a ref, then cancel it? and use quantization @4n
 
@@ -86,30 +84,13 @@ const Metronome = () => {
     }
   }, []);
 
-  const handlePlayClick = () => {
-    if (!isPlaying) {
-      if (Tone.Transport.state !== "started") {
-        Tone.Transport.start();
-      }
-      restartSequence();
-    } else {
-      setIsBlinking(false);
-      Tone.Transport.stop();
-    }
-    setIsPlaying(!isPlaying)
-  }
-
   const handleHelp = () => {
     console.log(Tone.Transport.state)
   }
 
   return (
     <Box className="metronome">
-      <Box my={3}>
-        <Button variant='contained' id='starter' onClick={handlePlayClick} disabled={!isLoaded}>
-          {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-        </Button>
-      </Box>
+      <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
       <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
       <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} restartSequence={restartSequence} />
 
@@ -127,7 +108,7 @@ const Metronome = () => {
       </Box>
 
       {/* <Button variant='contained' onClick={handleHelp}>Help</Button> */}
-      <Grader/>
+      <Grader />
     </Box>
   );
 };
