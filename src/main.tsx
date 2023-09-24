@@ -22,11 +22,11 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '&:focus': {
+            // boxSizing: 'border-box',
             outline: '1px solid white', // Change the outline color to purple when focused
-            border: `1px solid ${purple.A200}`, // Change the outline color to purple when focused
-            boxShadow: `inset 0px 0px 0px 1px ${purple.A200}`,
+            // border: `1px solid ${purple.A200}`, // Change the outline color to purple when focused
+            boxShadow: `inset 0px 0px 0px 2px ${purple.A200}`,
             transition: 'none'
-
           },
         },
       },
