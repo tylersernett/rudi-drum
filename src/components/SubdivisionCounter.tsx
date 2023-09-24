@@ -8,13 +8,11 @@ import Sequence from 'tone';
 interface SubdivisionCounterProps {
   subdivisions: number;
   setSubdivisions: Dispatch<SetStateAction<number>>;
-  stop: () => void;
-  start: () => void;
   restartSequence: (restartTime?: number) => void;
   // sequence: MutableRefObject<Sequence<any> | null>;
 }
 
-const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ subdivisions, setSubdivisions, stop, start, restartSequence, }) => {
+const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ subdivisions, setSubdivisions, restartSequence, }) => {
   const subMin = 1;
   const subMax = 8;
   const incrementSubdivisions = (val: number): void => {
@@ -25,16 +23,13 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ subdivisions, s
   // Use useEffect to listen for changes in subdivisions
   useEffect(() => {
     if (Tone.Transport.state === "started") {
-      // stop();
-      // start();
-
       restartSequence();
 
       // const nextQuarterNoteTime = Tone.Transport.nextSubdivision('@4n');
       // console.log('Next quarter note time:', nextQuarterNoteTime);
       // restartSequence(Tone.now() + nextQuarterNoteTime);
     }
-  }, [subdivisions,]);
+  }, [subdivisions]);
 
   return (
     <Box mt={2}>

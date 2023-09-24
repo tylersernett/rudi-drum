@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { Box, Slider, Typography, Button } from "@mui/material";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import * as Tone from 'tone';
 import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
@@ -13,6 +15,7 @@ const Metronome = () => {
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
   const [isBlinking, setIsBlinking] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   //put sequence in a ref, then cancel it? and use quantization @4n
 
@@ -38,6 +41,7 @@ const Metronome = () => {
       if (sampler.current) {
         sampler.current.triggerAttackRelease(note, "32n", time);
         // Tone.Draw.schedule(() => setIsBlinking(true), time); //this will blink EVERY subdivision
+        // console.log('DOWNBEA7: ', time)
       }
     }, [["C4", ...subDivNotes]], "4n").start(restartTime);
 
@@ -47,22 +51,7 @@ const Metronome = () => {
       Tone.Draw.schedule(() => setIsBlinking(true), time);
       // Tone.Draw.schedule(() => setIsBlinking(true), "+8n"); //8th note later
       console.log('DOWNBEAT: ', time)
-    }, "4n",restartTime );
-  }
-
-  function start() {
-    if (Tone.Transport.state !== "started") {
-
-      
-      Tone.Transport.start();
-    }
-    restartSequence();
-  }
-
-  function stop() {
-    setIsBlinking(false);
-    Tone.Transport.cancel(); //??? cancel vs stop vs dispose?
-    // Tone.Transport.stop();
+    }, "4n", restartTime);
   }
 
   const handleSliderChange = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
@@ -96,9 +85,26 @@ const Metronome = () => {
     }
   }, []);
 
+  const handlePlayClick = () => {
+    if (!isPlaying) {
+      if (Tone.Transport.state !== "started") {
+        Tone.Transport.start();
+      }
+      restartSequence();
+    } else {
+      setIsBlinking(false);
+      Tone.Transport.stop();
+    }
+    setIsPlaying(!isPlaying)
+  }
+
+  const handleHelp = () => {
+    console.log(Tone.Transport.state)
+  }
+
   return (
     <div className="metronome">
-      <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} stop={stop} start={start} restartSequence={restartSequence} />
+      <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} restartSequence={restartSequence} />
       <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
       <Slider
         min={20}
@@ -111,9 +117,11 @@ const Metronome = () => {
         <Typography variant="body1">Beats per Minute (BPM): {beat}</Typography>
       </Box>
       <Box mt={2}>
-        <Button variant='contained' id='starter' onClick={() => start()} disabled={!isLoaded}>Start</Button>
-        <Button variant='contained' onClick={() => stop()}>Stop</Button>
+        <Button variant='contained' id='starter' onClick={handlePlayClick} disabled={!isLoaded}>
+          {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+        </Button>
       </Box>
+        <Button variant='contained' onClick={handleHelp}>Help</Button>
     </div>
   );
 };
