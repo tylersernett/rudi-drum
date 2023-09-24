@@ -7,6 +7,7 @@ import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
 import Blinker from "./Blinker";
 import SubdivisionCounter from "./SubdivisionCounter";
+import Grader from "./Grader";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
@@ -103,26 +104,31 @@ const Metronome = () => {
   }
 
   return (
-    <div className="metronome">
-      <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} restartSequence={restartSequence} />
-      <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
-      <Slider
-        min={20}
-        max={256}
-        value={beat}
-        onChange={handleSliderChange}
-        onChangeCommitted={handleSliderCommit}
-      />
-      <Box mt={1}>
-        <Typography variant="body1">Beats per Minute (BPM): {beat}</Typography>
-      </Box>
-      <Box mt={2}>
+    <Box className="metronome">
+      <Box my={3}>
         <Button variant='contained' id='starter' onClick={handlePlayClick} disabled={!isLoaded}>
           {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
         </Button>
       </Box>
-        <Button variant='contained' onClick={handleHelp}>Help</Button>
-    </div>
+      <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
+      <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} restartSequence={restartSequence} />
+
+      <Box mt={1} display='flex' alignItems='center'>
+        <Typography variant="body1" mr={2} sx={{ flexShrink: 0, }}>BPM</Typography>
+        <Slider
+          min={20}
+          max={256}
+          value={beat}
+          onChange={handleSliderChange}
+          onChangeCommitted={handleSliderCommit}
+          sx={{ minWidth: '150px', }}
+        />
+        <Typography variant="body1" ml={2} sx={{ minWidth: '3ch' }}>{beat}</Typography>
+      </Box>
+
+      {/* <Button variant='contained' onClick={handleHelp}>Help</Button> */}
+      <Grader/>
+    </Box>
   );
 };
 

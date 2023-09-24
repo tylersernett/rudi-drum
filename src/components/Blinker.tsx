@@ -25,7 +25,7 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
   if (isBlinking) {
     setTimeout(() => {
       setIsBlinking(false)
-    }, 60);
+    }, 60); //60
     // Tone.Draw.schedule(() => setIsBlinking(false), Tone.now() +Tone.Time("32n").toSeconds());
   }
   const handleToggleChange = () => {
@@ -35,16 +35,19 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
 
   return (
     <>
-      <Switch
-        checked={blinkToggle}
-        onChange={handleToggleChange}
-        color="primary"
-      />
-      <Typography>Blink: {blinkToggle ? 'On' : 'Off'}</Typography>
+      <Box display='flex' justifyContent="center" alignItems='center'>
+        <Typography>Blink</Typography>
+        <Switch
+          checked={blinkToggle}
+          onChange={handleToggleChange}
+          color="primary"
+        />
+        <Typography sx={{ minWidth: '4ch' }}>{blinkToggle ? 'On' : 'Off'}</Typography>
+      </Box>
+
       <Box
         display="flex"
         justifyContent="center"
-      // mt={2}
       >
         <div id='sq' style={squareStyle} />
       </Box>
