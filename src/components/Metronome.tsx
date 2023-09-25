@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
-import { Box, Slider, Typography, Button } from "@mui/material";
+import { Box, Slider, Typography, Button, Grid, Input } from "@mui/material";
+import VolumeUp from '@mui/icons-material/VolumeUp';
 import * as Tone from 'tone';
 import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
@@ -15,6 +16,7 @@ const Metronome = () => {
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
   const [isBlinking, setIsBlinking] = useState(false);
+  const [volume, setVolume] = useState(100);
 
   //put sequence in a ref, then cancel it? and use quantization @4n
 
@@ -46,11 +48,18 @@ const Metronome = () => {
 
     console.log("SEQ: ", sequence.current); //sequence.current.part.events[0]
 
-    Tone.Transport.scheduleRepeat((time) => {
-      Tone.Draw.schedule(() => setIsBlinking(true), time);
-      // Tone.Draw.schedule(() => setIsBlinking(true), "+8n"); //8th note later
-      console.log('DOWNBEAT: ', time)
-    }, "4n", restartTime);
+    const drawLoop = new Tone.Loop((time) => {
+      Tone.Draw.schedule(() => {
+        setIsBlinking(true)
+      }, time) //use AudioContext time of the event
+    }, "4n").start(restartTime)
+
+    //ADD LATER: multiblink
+    // const drawLoop2 = new Tone.Loop((time) => {
+    //   Tone.Draw.schedule(() => {
+    //     setIsBlinking(true)
+    //   }, time) //use AudioContext time of the event
+    // }, "4n").start(restartTime + Tone.Transport.toSeconds("20n"))
   }
 
   const handleSliderChange = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
@@ -88,26 +97,58 @@ const Metronome = () => {
     console.log(Tone.Transport.state)
   }
 
+  const handleVolumeChange = (event: React.SyntheticEvent | Event, value: number | number[]) => {
+    if (typeof value === "number") {
+      const volumeValue = mapToDecibels(value); // Convert to decibels
+      setVolume(value);
+      if (sampler.current) {
+        sampler.current.volume.value = volumeValue;
+      }
+    } else {
+      console.warn("Unexpected value:", value);
+    }
+  }
+  // Conversion function to map the 0 to 100 range to -50 to 0 dB range
+  const mapToDecibels = (value: number) => {
+    return -30 + (value / 100) * 30;
+  };
+
   return (
     <Box className="metronome">
       <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
       <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
       <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} restartSequence={restartSequence} />
 
-      <Box mt={1} display='flex' alignItems='center'>
-        <Typography variant="body1" mr={2} sx={{ flexShrink: 0, }}>BPM</Typography>
+      <Box mt={1} display='flex' alignItems='center' sx={{ width: '250px', }}>
+        <Typography variant="body1" mr={2} sx={{ flexShrink: 0, }} >BPM</Typography>
         <Slider
           min={20}
           max={256}
           value={beat}
           onChange={handleSliderChange}
           onChangeCommitted={handleSliderCommit}
-          sx={{ minWidth: '150px', }}
         />
         <Typography variant="body1" ml={2} sx={{ minWidth: '3ch' }}>{beat}</Typography>
       </Box>
 
-      {/* <Button variant='contained' onClick={handleHelp}>Help</Button> */}
+      <Grid container spacing={2} alignItems="center"  >
+        <Grid item width={'5ch'}>
+          <VolumeUp />
+        </Grid>
+        <Grid item xs>
+          <Slider
+            min={0}
+            max={100}
+            value={volume}
+            onChange={handleVolumeChange}
+          />
+        </Grid>
+        <Grid item width={'5ch'}>
+          {volume}
+        </Grid>
+      </Grid>
+
+      <Button variant='contained' onClick={handleHelp}>Help</Button>
       <Grader />
     </Box>
   );
