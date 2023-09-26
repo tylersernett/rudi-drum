@@ -7,6 +7,7 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
+import loginService from '../services/login';
 
 interface LoginModalProps {
   open: boolean;
@@ -23,12 +24,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
     onClose();
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // ADD SERVER LOGIC !!!
     console.log('Username:', username);
     console.log('Password:', password);
-    handleClose();
-  };
+    try {
+      const user = await loginService.login({username, password})
+      handleClose();
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
 
   return (
     <Dialog open={open} onClose={handleClose}>
