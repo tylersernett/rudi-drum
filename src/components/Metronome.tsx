@@ -102,7 +102,11 @@ const Metronome = () => {
       const volumeValue = mapToDecibels(value); // Convert to decibels
       setVolume(value);
       if (sampler.current) {
-        sampler.current.volume.value = volumeValue;
+        if (value >= 1) {
+          sampler.current.volume.value = volumeValue;
+        } else {
+          sampler.current.volume.value = -9999;
+        }
       }
     } else {
       console.warn("Unexpected value:", value);
