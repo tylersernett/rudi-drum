@@ -11,7 +11,7 @@ import PlayPause from "./PlayPause";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
-  const [beat, setBeat] = useState(120);
+  const [bpm, setBpm] = useState(120);
   const [subdivisions, setSubdivisions] = useState(1);
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
@@ -28,7 +28,7 @@ const Metronome = () => {
       },
       onload: () => {
         setLoaded(true);
-        Tone.Transport.bpm.value = beat
+        Tone.Transport.bpm.value = bpm
       }
     }).toDestination();
 
@@ -63,10 +63,10 @@ const Metronome = () => {
   }
 
   const handleSliderChange = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
-    processSliderValue(newValue, setBeat);
+    processSliderValue(newValue, setBpm);
   };
   const handleSliderCommit = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
-    processSliderValue(newValue, setBeat);
+    processSliderValue(newValue, setBpm);
   };
   const processSliderValue = (value: number | number[], updateState: (value: number) => void) => {
     if (typeof value === 'number') {
@@ -128,11 +128,11 @@ const Metronome = () => {
         <Slider
           min={20}
           max={256}
-          value={beat}
+          value={bpm}
           onChange={handleSliderChange}
           onChangeCommitted={handleSliderCommit}
         />
-        <Typography variant="body1" ml={2} sx={{ minWidth: '3ch' }}>{beat}</Typography>
+        <Typography variant="body1" ml={2} sx={{ minWidth: '3ch' }}>{bpm}</Typography>
       </Box>
 
       <Grid container spacing={2} alignItems="center"  >
