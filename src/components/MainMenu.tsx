@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useUserContext } from '../context/UserContext';
+import { useMetronomeContext } from "../context/MetronomeContext";
+import SaveDialog from './SaveDialog';
 
 const MainMenu = () => {
   const { username } = useUserContext();
+  const { metronome, setMetronome, resetMetronome } = useMetronomeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [isSaveDialogOpen, setSaveDialogOpen] = useState(false); // State to control the dialog open/close
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -16,13 +21,26 @@ const MainMenu = () => {
 
   const handleResetPattern = () => {
     console.log('resetting pattern...')
+    resetMetronome();
   }
   const handleLoadPattern = () => {
+    const testBpm = 163
+    const testSub = 3
+    const testBlink = false;
     console.log('loading pattern...')
+    setMetronome({ title: 'test', bpm: testBpm, subdivisions: testSub, blinkToggle: testBlink })
   }
-  const handleSavePattern = () => {
-    console.log('saving pattern...')
+  // const handleSavePattern = () => {
+  //   console.log('saving pattern...', metronome)
+  // }
+
+  const handleOpenSaveDialog = () => {
+    setSaveDialogOpen(true);
   }
+
+  const handleCloseSaveDialog = () => {
+    setSaveDialogOpen(false);
+  };
 
   return (
     <>
@@ -36,6 +54,7 @@ const MainMenu = () => {
       >
         <MenuIcon fontSize='large' />
       </IconButton>
+      {/* some repitition in the following...but MUI Menus cannot contain fragment children, so this seems the best way... */}
       {username ? (
         <Menu
           id="basic-menu"
@@ -49,7 +68,7 @@ const MainMenu = () => {
           <MenuItem onClick={handleClose}>Advanced Settings</MenuItem>
           <MenuItem onClick={handleResetPattern}>Reset Pattern</MenuItem>
           <MenuItem key="load" onClick={handleLoadPattern} >Load Pattern</MenuItem>
-          <MenuItem key="save" onClick={handleSavePattern} >Save Pattern</MenuItem>
+          <MenuItem key="save" onClick={handleOpenSaveDialog} >Save Pattern</MenuItem>
         </Menu>
       ) : (
         <Menu
@@ -77,6 +96,8 @@ const MainMenu = () => {
           <MenuItem onClick={handleClose}>Sign Up</MenuItem>
         </Menu >
       )}
+
+      <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} />
     </>
   )
 }
