@@ -2,6 +2,7 @@
 // import * as Tone from 'tone';
 import { Dispatch, SetStateAction, useState } from "react";
 import { Box, Switch, Typography } from "@mui/material";
+import { useMetronomeContext } from "../context/MetronomeContext";
 
 type Visibility = "visible" | "hidden";
 
@@ -11,7 +12,8 @@ interface BlinkingSquareProps {
 }
 
 const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) => {
-  const [blinkToggle, setBlinkToggle] = useState(true);
+  const { metronome, setMetronome } = useMetronomeContext();
+  const {blinkToggle} = metronome;
 
   const squareStyle = {
     width: "50px",
@@ -29,7 +31,7 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
     // Tone.Draw.schedule(() => setIsBlinking(false), Tone.now() +Tone.Time("32n").toSeconds());
   }
   const handleToggleChange = () => {
-    setBlinkToggle((prevBlinkToggle) => !prevBlinkToggle);
+    setMetronome({...metronome, blinkToggle: !metronome.blinkToggle});
   };
 
 

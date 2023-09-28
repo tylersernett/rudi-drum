@@ -4,20 +4,22 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import * as Tone from 'tone';
 import Sequence from 'tone';
+import { useMetronomeContext } from "../context/MetronomeContext";
+
 
 interface SubdivisionCounterProps {
-  subdivisions: number;
-  setSubdivisions: Dispatch<SetStateAction<number>>;
   restartSequence: (restartTime?: number) => void;
   // sequence: MutableRefObject<Sequence<any> | null>;
 }
 
-const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ subdivisions, setSubdivisions, restartSequence, }) => {
+const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence, }) => {
+  const { metronome, setMetronome } = useMetronomeContext();
+  const { subdivisions } = metronome;
   const subMin = 1;
   const subMax = 8;
   const incrementSubdivisions = (val: number): void => {
     const newValue = Math.min(Math.max(subdivisions + val, subMin), subMax);
-    setSubdivisions(newValue);
+    setMetronome({ ...metronome, subdivisions: newValue });
   };
 
   // Use useEffect to listen for changes in subdivisions
@@ -32,7 +34,7 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ subdivisions, s
   }, [subdivisions]);
 
   return (
-    <Box mt={2}>
+    <Box mt={3}>
       <Button variant="outlined" onClick={() => incrementSubdivisions(-1)} disabled={subdivisions === subMin}><RemoveIcon /></Button>
       <Button variant="outlined" onClick={() => incrementSubdivisions(1)} disabled={subdivisions === subMax}><AddIcon /></Button>
       <Typography variant="body1">

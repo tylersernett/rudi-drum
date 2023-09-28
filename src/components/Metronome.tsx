@@ -8,17 +8,17 @@ import Blinker from "./Blinker";
 import SubdivisionCounter from "./SubdivisionCounter";
 import Grader from "./Grader";
 import PlayPause from "./PlayPause";
+import { useMetronomeContext } from "../context/MetronomeContext";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
-  const [bpm, setBpm] = useState(120);
-  const [subdivisions, setSubdivisions] = useState(1);
+  const [isBlinking, setIsBlinking] = useState(false);
+  const { metronome, setMetronome } = useMetronomeContext();
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
-  const [isBlinking, setIsBlinking] = useState(false);
   const [volume, setVolume] = useState(100);
 
-  //put sequence in a ref, then cancel it? and use quantization @4n
+  const { bpm, subdivisions } = metronome;
 
   useEffect(() => {
     sampler.current = new Tone.Sampler({
@@ -35,6 +35,11 @@ const Metronome = () => {
     // restartSequence();
   }, [])
 
+  //update tempo on bpm change (needed when bpm changes from a load or other non-slider input)
+  useEffect(() => {
+    Tone.Transport.bpm.value = bpm
+  }, [bpm])
+  
   const restartSequence = (restartTime = 0) => {
     Tone.Transport.cancel();
     const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3");
@@ -63,10 +68,20 @@ const Metronome = () => {
   }
 
   const handleSliderChange = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
-    processSliderValue(newValue, setBpm);
+    processSliderValue(newValue, (newBpm) => {
+      setMetronome({
+        ...metronome,
+        bpm: newBpm,
+      });
+    });
   };
   const handleSliderCommit = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
-    processSliderValue(newValue, setBpm);
+    processSliderValue(newValue, (newBpm) => {
+      setMetronome({
+        ...metronome,
+        bpm: newBpm,
+      });
+    });
   };
   const processSliderValue = (value: number | number[], updateState: (value: number) => void) => {
     if (typeof value === 'number') {
@@ -121,7 +136,7 @@ const Metronome = () => {
     <Box className="metronome">
       <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
       <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
-      <SubdivisionCounter subdivisions={subdivisions} setSubdivisions={setSubdivisions} restartSequence={restartSequence} />
+      <SubdivisionCounter restartSequence={restartSequence} />
 
       <Box mt={1} display='flex' alignItems='center' sx={{ width: '250px', }}>
         <Typography variant="body1" mr={2} sx={{ flexShrink: 0, }} >BPM</Typography>
