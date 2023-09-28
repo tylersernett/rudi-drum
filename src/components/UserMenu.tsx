@@ -48,7 +48,7 @@ const UserMenu = () => {
         }}
       >
         <Typography variant='h5' mx={2} mb={1} color='primary'>{username}</Typography>
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
+        <MenuItem onClick={handleClose} autoFocus>Profile</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </>
