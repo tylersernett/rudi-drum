@@ -1,13 +1,14 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
 
 export interface IUser {
   username: string;
-  bearerToken: string;
+  token: string;
 }
 
-type UserContextType = IUser & {
-  setUserInfo: (username: string, bearerToken: string) => void;
+type UserContextType = {
+  user: IUser;
   clearUserInfo: () => void;
+  setUser: Dispatch<SetStateAction<IUser>>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -17,26 +18,20 @@ export const useUserContext = () => {
   if (context === undefined) {
     throw new Error('useUserContext must be within UserProvider');
   }
-
   return context;
 };
 
+const initialUserState = {
+  username: '',
+  token: '',
+}
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<IUser>({
-    username: '',
-    bearerToken: '',
-  });
-
-  const setUserInfo = (username: string, bearerToken: string) => {
-    setUser({ username, bearerToken });
-  };
-
-  const clearUserInfo = () => {
-    setUser({ username: '', bearerToken: '' });
-  };
+  const [user, setUser] = useState<IUser>(initialUserState);
+  const clearUserInfo = () => setUser(initialUserState);
 
   return (
-    <UserContext.Provider value={{ ...user, setUserInfo, clearUserInfo }}>
+    <UserContext.Provider value={{ user, clearUserInfo, setUser }}>
       {children}
     </UserContext.Provider>
   );

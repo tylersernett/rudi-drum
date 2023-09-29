@@ -7,7 +7,7 @@ import MainMenu from "./MainMenu";
 import UserMenu from "./UserMenu";
 
 const TopBar = () => {
-  const { username } = useUserContext();
+  const { user } = useUserContext();
   const [openLoginModal, setOpenLoginModal] = useState(false);
 
   const handleOpenLoginModal = () => {
@@ -25,7 +25,7 @@ const TopBar = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Placeholder
         </Typography>
-        {username ? (
+        {user.username ? (
           <UserMenu />
         ) : (
           <Button color="primary" onClick={handleOpenLoginModal}><Typography variant='body2'>Login</Typography></Button>

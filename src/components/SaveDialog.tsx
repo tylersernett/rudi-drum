@@ -11,7 +11,7 @@ interface SaveDialogProps {
 
 const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose }) => {
   const { metronome, setMetronome } = useMetronomeContext();
-  const {bearerToken} = useUserContext();
+  const { user } = useUserContext();
   // const [savePatternTitle, setSavePatternTitle] = useState(""); // State to store the pattern title
 
   const handleClose = () => {
@@ -23,7 +23,7 @@ const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose }) => {
     e.preventDefault();
     console.log('saving metronome...', metronome);
     try {
-      const savedMetronome = await metronomesService.create(metronome, bearerToken)
+      const savedMetronome = await metronomesService.create(metronome, user.token)
       console.log('good save:', savedMetronome)
       // setUserInfo(savedMetronome.username, savedMetronome.token)
       // setMetronome(savedMetronome);

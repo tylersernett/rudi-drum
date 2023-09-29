@@ -6,7 +6,7 @@ import { useMetronomeContext } from "../context/MetronomeContext";
 import SaveDialog from './SaveDialog';
 
 const MainMenu = () => {
-  const { username } = useUserContext();
+  const { user } = useUserContext();
   const { metronome, setMetronome, resetMetronome } = useMetronomeContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -55,7 +55,7 @@ const MainMenu = () => {
         <MenuIcon fontSize='large' />
       </IconButton>
       {/* some repitition in the following...but MUI Menus cannot contain fragment children, so this seems the best way... */}
-      {username ? (
+      {user.username ? (
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}

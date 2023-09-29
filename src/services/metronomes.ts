@@ -2,10 +2,10 @@ import axios from 'axios';
 import { API_URL } from '../../config';
 import { IMetronome } from '../context/MetronomeContext';
 
-const create = async (metronome: IMetronome, bearerToken: string): Promise<IMetronome> => {
+const create = async (metronome: IMetronome, token: string): Promise<IMetronome> => {
   try {
     const headers = {
-      Authorization: `Bearer ${bearerToken}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
 
