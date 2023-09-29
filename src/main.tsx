@@ -11,11 +11,11 @@ import { MetronomeProvider } from './context/MetronomeContext.tsx';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <UserProvider>
-    <MetronomeProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
+      <MetronomeProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
       </MetronomeProvider>
     </UserProvider>
   </React.StrictMode>,

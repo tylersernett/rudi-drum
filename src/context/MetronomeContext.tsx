@@ -7,6 +7,13 @@ export interface IMetronome {
   blinkToggle: boolean;
 }
 
+export interface MetronomeItem extends IMetronome{
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  user: { username: string };
+}
+
 type MetronomeContextType = {
   metronome: IMetronome,
   setMetronome: Dispatch<SetStateAction<IMetronome>>

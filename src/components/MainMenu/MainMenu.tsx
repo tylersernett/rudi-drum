@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { ClickAwayListener, IconButton, Menu, MenuItem, Tooltip, Popover } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useUserContext } from '../context/UserContext';
-import { useMetronomeContext } from "../context/MetronomeContext";
-import SaveDialog from './SaveDialog';
+import { useUserContext } from '../../context/UserContext';
+import { useMetronomeContext } from "../../context/MetronomeContext";
+import SaveDialog from '../SaveDialog';
+import LoadMenu from './LoadMenu';
 
 const MainMenu = () => {
   const { user } = useUserContext();
@@ -11,12 +12,15 @@ const MainMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [isSaveDialogOpen, setSaveDialogOpen] = useState(false); // State to control the dialog open/close
+  // const [openMetronomeTable, setOpenMetronomeTable] = useState(false); // State to control the metronome table visibility
+  const [anchorPopover, setAnchorPopover] = useState<null | HTMLElement>(null); // State to control the popover open/close
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+    // setOpenMetronomeTable(false);
   };
 
   const handleResetPattern = () => {
@@ -40,6 +44,14 @@ const MainMenu = () => {
 
   const handleCloseSaveDialog = () => {
     setSaveDialogOpen(false);
+  };
+
+  const handleBrowsePatterns = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorPopover(event.currentTarget); // Open the popover
+  };
+
+  const handleClosePopover = () => {
+    setAnchorPopover(null); // Close the popover
   };
 
   return (
@@ -67,7 +79,8 @@ const MainMenu = () => {
         >
           <MenuItem onClick={handleClose}>Advanced Settings</MenuItem>
           <MenuItem onClick={handleResetPattern}>Reset Pattern</MenuItem>
-          <MenuItem key="load" onClick={handleLoadPattern} >Load Pattern</MenuItem>
+          {/* <MenuItem key="load" onClick={handleLoadPattern} >Load Pattern</MenuItem> */}
+          <MenuItem onClick={handleBrowsePatterns} >Browse Patterns</MenuItem>
           <MenuItem key="save" onClick={handleOpenSaveDialog} >Save Pattern</MenuItem>
         </Menu>
       ) : (
@@ -98,6 +111,23 @@ const MainMenu = () => {
       )}
 
       <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} />
+
+      {/* Popover for Browse Patterns */}
+      <Popover
+        open={Boolean(anchorPopover)}
+        anchorEl={anchorPopover}
+        onClose={handleClosePopover}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <LoadMenu />
+      </Popover>
     </>
   )
 }
