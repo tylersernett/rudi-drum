@@ -5,6 +5,9 @@ import { useUserContext } from '../../context/UserContext';
 import { useMetronomeContext } from "../../context/MetronomeContext";
 import SaveDialog from '../SaveDialog';
 import LoadMenu from './LoadMenu';
+import SignUpDialog from './SignUpDialog';
+import usersService from '../../services/users';
+import loginService from '../../services/login';
 
 const MainMenu = () => {
   const { user } = useUserContext();
@@ -12,6 +15,7 @@ const MainMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [isSaveDialogOpen, setSaveDialogOpen] = useState(false); // State to control the dialog open/close
+  const [isSignUpDialogOpen, setSignUpDialogOpen] = useState(false);
   // const [openMetronomeTable, setOpenMetronomeTable] = useState(false); // State to control the metronome table visibility
   const [anchorPopover, setAnchorPopover] = useState<null | HTMLElement>(null); // State to control the popover open/close
 
@@ -52,6 +56,24 @@ const MainMenu = () => {
 
   const handleClosePopover = () => {
     setAnchorPopover(null); // Close the popover
+  };
+
+  const handleOpenSignUpDialog = () => {
+    setSignUpDialogOpen(true);
+  };
+
+  const handleCloseSignUpDialog = () => {
+    setSignUpDialogOpen(false);
+  };
+
+  const handleSignUp = async (username: string, password: string) => {
+    try {
+      const newUser = { username, password }
+      await usersService.create(newUser)
+      handleCloseSignUpDialog();
+    } catch (error) {
+      console.log('error submitting sign up: ', error)
+    }
   };
 
   return (
@@ -106,12 +128,12 @@ const MainMenu = () => {
               <MenuItem disabled>Save Pattern</MenuItem>
             </span>
           </Tooltip>
-          <MenuItem onClick={handleClose}>Sign Up</MenuItem>
+          <MenuItem onClick={handleOpenSignUpDialog}>Sign Up</MenuItem>
         </Menu >
       )}
 
       <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} />
-
+      <SignUpDialog open={isSignUpDialogOpen} onClose={handleCloseSignUpDialog} onSignUp={handleSignUp} />
       {/* Popover for Browse Patterns */}
       <Popover
         open={Boolean(anchorPopover)}
