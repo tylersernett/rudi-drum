@@ -36,26 +36,28 @@ const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Save Pattern</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Title"
-          type="text"
-          fullWidth
-          value={metronome.title}
-          onChange={(e) => setMetronome({ ...metronome, title: e.target.value })}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleSubmit} color="primary">
-          Save
-        </Button>
-      </DialogActions>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Save Pattern</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Title"
+            type="text"
+            fullWidth
+            value={metronome.title}
+            onChange={(e) => setMetronome({ ...metronome, title: e.target.value })}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button type='submit' color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   )
 }
