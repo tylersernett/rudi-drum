@@ -3,6 +3,9 @@ export interface LoginCredentials {
   password: string;
 }
 
+export type Direction = 'asc' | 'desc' | undefined;
+
+
 // export interface SignupCredentials extends LoginCredentials {
 //   name: string;
 // }

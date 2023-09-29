@@ -6,48 +6,8 @@ import { useUserContext } from '../../context/UserContext';
 import { Title } from '@mui/icons-material';
 import { useMetronomeContext } from '../../context/MetronomeContext';
 import { MetronomeItem } from '../../context/MetronomeContext';
-
-type Direction = 'asc' | 'desc' | undefined;
-
-const columns = [
-  { id: 'title', label: 'Title' },
-  { id: 'bpm', label: 'BPM' },
-  { id: 'subdivisions', label: 'Subs' },
-];
-interface SortableTableHeadProps {
-  sortConfig: {
-    key: string;
-    direction: Direction;
-  };
-  handleSort: (column: string) => void;
-  isMobile: boolean;
-}
-const SortableTableHead: React.FC<SortableTableHeadProps> = ({ sortConfig, handleSort, isMobile }) => {
-  return (
-    <TableHead sx={{ fontWeight: 'bold' }}>
-      <TableRow>
-        {columns.map((column) => {
-          if (isMobile && column.id === 'subdivisions') {
-            // Don't render the "Subs" column header when isMobile is true
-            return null;
-          }
-          return (
-            <TableCell key={column.id}>
-              <TableSortLabel
-                active={sortConfig.key === column.id}
-                direction={sortConfig.key === column.id ? sortConfig.direction : 'asc'}
-                onClick={() => handleSort(column.id)}
-              >
-                {column.label}
-              </TableSortLabel>
-            </TableCell>
-          );
-        })}
-        <TableCell>Delete</TableCell>
-      </TableRow>
-    </TableHead>
-  );
-};
+import { Direction } from '../../types';
+import SortableTableHead from './SortableTableHead';
 
 const LoadMenu = () => {
   const { user } = useUserContext();
@@ -108,8 +68,8 @@ const LoadMenu = () => {
 
   return (
     <TableContainer component={Paper}>
-      <Table size="small" sx={{backgroundColor:'#2f2f2f'}}>
-        <SortableTableHead sortConfig={sortConfig} handleSort={handleSort} isMobile={isMobile}/>
+      <Table size="small" sx={{ backgroundColor: '#2f2f2f' }}>
+        <SortableTableHead sortConfig={sortConfig} handleSort={handleSort} isMobile={isMobile} />
         <TableBody>
           {sortedMetronomeData.map((metronomeItem: MetronomeItem) => (
             <TableRow key={metronomeItem.id}>
