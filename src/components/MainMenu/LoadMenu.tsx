@@ -3,11 +3,11 @@ import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper
 import DeleteIcon from '@mui/icons-material/Delete';
 import metronomesService from '../../services/metronomes';
 import { useUserContext } from '../../context/UserContext';
-import { Title } from '@mui/icons-material';
 import { useMetronomeContext } from '../../context/MetronomeContext';
 import { MetronomeItem } from '../../context/MetronomeContext';
 import { Direction } from '../../types';
 import SortableTableHead from './SortableTableHead';
+import DeleteDialog from './DeleteDialog';
 
 const LoadMenu = () => {
   const { user } = useUserContext();
@@ -15,9 +15,13 @@ const LoadMenu = () => {
   const [metronomeData, setMetronomeData] = useState([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: Direction }>({
     key: 'title',
-    direction: 'asc', 
+    direction: 'asc',
   });
   const isMobile = useMediaQuery('(max-width: 600px)'); // Define your mobile breakpoint here
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Metronome Item to Delete
+  const [metronomeToDelete, setMetronomeToDelete] = useState<MetronomeItem | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +47,28 @@ const LoadMenu = () => {
 
   const handleDelete = (metronomeItem: MetronomeItem) => {
     console.log('Clicked trash, metronome data:', metronomeItem);
+    setMetronomeToDelete(metronomeItem);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setMetronomeToDelete(null);
+    setDeleteDialogOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      if (metronomeToDelete && user.token) {
+        await metronomesService.remove(metronomeToDelete.id, user.token)
+        // Fetch the updated list of metronomes
+        const updatedMetronomeData = await metronomesService.getOwn(user.token);
+        // Update the state with the updated data
+        setMetronomeData(updatedMetronomeData);
+        setDeleteDialogOpen(false);
+      }
+    } catch (error) {
+      console.log("Error deleting metronome: ", error)
+    }
   };
 
   const handleSort = (key: string) => {
@@ -95,6 +121,11 @@ const LoadMenu = () => {
           ))}
         </TableBody>
       </Table>
+      <DeleteDialog
+        open={isDeleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        onConfirmDelete={handleConfirmDelete}
+      />
     </TableContainer>
   );
 };

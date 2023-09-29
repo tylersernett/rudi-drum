@@ -31,4 +31,20 @@ const getOwn = async (token: string) => {
   }
 }
 
-export default { create, getOwn };
+const remove = async (id: number, token: string) => {
+  try {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // Send a DELETE request to the backend API
+    await axios.delete(`${API_URL}/metronomes/${id}`, { headers });
+
+    // The server will respond with a 204 status code if successful
+  } catch (error) {
+    console.error('Error deleting metronome:', error);
+    throw error;
+  }
+};
+
+export default { create, getOwn, remove };
