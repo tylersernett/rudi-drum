@@ -42,8 +42,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth='xs' disableRestoreFocus>
-      <DialogTitle>Login</DialogTitle>
       <form onSubmit={handleSubmit}>
+        <DialogTitle>Login</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
