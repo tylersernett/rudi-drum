@@ -8,7 +8,7 @@ interface LoginModalProps {
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
-  const { setUserInfo } = useUserContext();
+  const { setUser } = useUserContext();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +27,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
     try {
       const user = await loginService.login({ username, password })
       console.log('good login:', user)
-      setUserInfo(user.username, user.token)
+      setUser({ username: user.username, token: user.token })
+      window.localStorage.setItem('loggedRudiUser', JSON.stringify(user))
       handleClose();
     } catch (error) {
       setError('Login failed. Please check your credentials.');

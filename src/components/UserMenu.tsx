@@ -5,7 +5,7 @@ import logoutService from "../services/logout";
 import { useUserContext } from '../context/UserContext';
 
 const UserMenu = () => {
-  const { username, bearerToken, clearUserInfo } = useUserContext();
+  const { user, clearUserInfo } = useUserContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -18,9 +18,10 @@ const UserMenu = () => {
   const handleLogout = async () => {
     console.log('LOGOUT attempt')
     try {
-      await logoutService.logout(bearerToken)
+      await logoutService.logout(user.token)
       console.log('logout success')
       clearUserInfo()
+      window.localStorage.removeItem('loggedRudiUser')
     } catch (error) {
       console.log('error logging out', error)
     }
@@ -36,7 +37,7 @@ const UserMenu = () => {
         sx={{ mr: 2 }}
         onClick={handleClick}
       >
-        <AccountCircleIcon fontSize='large'/>
+        <AccountCircleIcon fontSize='large' />
       </IconButton>
       <Menu
         id="basic-menu"
@@ -47,7 +48,7 @@ const UserMenu = () => {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <Typography variant='h5' mx={2} mb={1} color='primary'>{username}</Typography>
+        <Typography variant='h5' mx={2} mb={1} color='primary'>{user.username}</Typography>
         <MenuItem onClick={handleClose} autoFocus>Profile</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
