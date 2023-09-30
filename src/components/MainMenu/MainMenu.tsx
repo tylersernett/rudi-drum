@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ClickAwayListener, IconButton, Menu, MenuItem, Tooltip, Popover } from '@mui/material';
+import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useUserContext } from '../../context/UserContext';
 import { useMetronomeContext } from "../../context/MetronomeContext";
@@ -12,7 +12,7 @@ import { MetronomeItem } from '../../context/MetronomeContext';
 
 const MainMenu = () => {
   const { user } = useUserContext();
-  const { metronome, setMetronome, resetMetronome } = useMetronomeContext();
+  const { resetMetronome } = useMetronomeContext();
   const [metronomeLoaded, setMetronomeLoaded] = useState(false);
   const [metronomeData, setMetronomeData] = useState<MetronomeItem[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -63,9 +63,16 @@ const MainMenu = () => {
     setSaveDialogOpen(false);
   };
 
-  const handleSaveSuccess = (updatedData:MetronomeItem) => {
-    // Update metronomeData with the updated data
+  const handleSaveSuccess = (updatedData: MetronomeItem) => {
     setMetronomeData((prevData) => [...prevData, updatedData]);
+  };
+
+  const handleUpdateSuccess = (updatedData: MetronomeItem) => {
+    setMetronomeData((prevData) =>
+      prevData.map((metronomeItem) =>
+        metronomeItem.id === updatedData.id ? updatedData : metronomeItem
+      )
+    );
   };
 
   const handleOpenSignUpDialog = () => {
@@ -85,7 +92,6 @@ const MainMenu = () => {
   const handleCloseBrowsePatternsDialog = () => {
     setBrowseDialogOpen(false);
   };
-
 
   const handleSignUp = async (username: string, password: string) => {
     try {
@@ -153,8 +159,8 @@ const MainMenu = () => {
         </Menu >
       )}
 
-      <BrowseDialog open={isBrowseDialogOpen} onClose={handleCloseBrowsePatternsDialog} metronomeData={metronomeData} setMetronomeData={setMetronomeData} metronomeLoaded={metronomeLoaded}/>
-      <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} onSaveSuccess={handleSaveSuccess} />
+      <BrowseDialog open={isBrowseDialogOpen} onClose={handleCloseBrowsePatternsDialog} metronomeData={metronomeData} setMetronomeData={setMetronomeData} metronomeLoaded={metronomeLoaded} />
+      <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} onSaveSuccess={handleSaveSuccess} onUpdateSuccess={handleUpdateSuccess} metronomeData={metronomeData} />
       <SignUpDialog open={isSignUpDialogOpen} onClose={handleCloseSignUpDialog} onSignUp={handleSignUp} />
     </>
   )

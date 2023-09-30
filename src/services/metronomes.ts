@@ -32,6 +32,22 @@ const getOwn = async (token: string): Promise<MetronomeItem[]> => {
   }
 }
 
+const update = async (metronome: MetronomeItem, token: string): Promise<MetronomeItem> => {
+  console.log('attempting update of: ', metronome)
+  try {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+    const id = metronome.id
+    const response = await axios.put<MetronomeItem>(`${API_URL}/metronomes/${id}`, metronome, { headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating metronome:', error);
+    throw error;
+  }
+}
+
 const remove = async (id: number, token: string) => {
   try {
     const headers = {
@@ -48,4 +64,4 @@ const remove = async (id: number, token: string) => {
   }
 };
 
-export default { create, getOwn, remove };
+export default { create, getOwn, update, remove };
