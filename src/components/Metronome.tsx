@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { Box, Slider, Typography, Button, Grid, Input } from "@mui/material";
 import VolumeUp from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import * as Tone from 'tone';
 import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
@@ -39,7 +40,7 @@ const Metronome = () => {
   useEffect(() => {
     Tone.Transport.bpm.value = bpm
   }, [bpm])
-  
+
   const restartSequence = (restartTime = 0) => {
     Tone.Transport.cancel();
     const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3");
@@ -109,7 +110,7 @@ const Metronome = () => {
   }, []);
 
   const handleHelp = () => {
-    console.log(Tone.Transport.state)
+    if (sampler.current) console.log(sampler?.current.volume)
   }
 
   const handleVolumeChange = (event: React.SyntheticEvent | Event, value: number | number[]) => {
@@ -120,7 +121,7 @@ const Metronome = () => {
         if (value >= 1) {
           sampler.current.volume.value = volumeValue;
         } else {
-          sampler.current.volume.value = -9999;
+          sampler.current.volume.value = sampler.current.volume.minValue;
         }
       }
     } else {
@@ -152,7 +153,7 @@ const Metronome = () => {
 
       <Grid container spacing={2} alignItems="center"  >
         <Grid item width={'5ch'}>
-          <VolumeUp />
+          {volume >= 1 ? <VolumeUp /> : <VolumeOffIcon />}
         </Grid>
         <Grid item xs>
           <Slider
@@ -160,6 +161,7 @@ const Metronome = () => {
             max={100}
             value={volume}
             onChange={handleVolumeChange}
+            onChangeCommitted={handleVolumeChange}
           />
         </Grid>
         <Grid item width={'5ch'}>
