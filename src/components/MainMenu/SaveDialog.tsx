@@ -1,8 +1,9 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
 import { useMetronomeContext } from "../../context/MetronomeContext";
 import metronomesService from '../../services/metronomes';
 import { useUserContext } from "../../context/UserContext";
 import { MetronomeItem } from "../../context/MetronomeContext";
+import { useState } from "react";
 
 interface SaveDialogProps {
   open: boolean;
@@ -15,10 +16,10 @@ interface SaveDialogProps {
 const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose, onSaveSuccess, onUpdateSuccess, metronomeData }) => {
   const { metronome, setMetronome } = useMetronomeContext();
   const { user } = useUserContext();
-  // const [savePatternTitle, setSavePatternTitle] = useState(""); // State to store the pattern title
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+  const [matchingTitle, setMatchingTitle] = useState<MetronomeItem | null>(null);
 
   const handleClose = () => {
-    // setSavePatternTitle(metronome.title)
     onClose();
   }
 
@@ -26,24 +27,47 @@ const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose, onSaveSuccess, o
     return metronomeData.find((metronomeItem) => metronomeItem.title === title);
   };
 
+  const handleOverwriteConfirm = async () => {
+    try {
+      //non-null assertion
+      // const updatedMetronome: MetronomeItem = {
+      // ...matchingTitle!,
+      // ...metronome,
+      // id: matchingTitle?.id ?? 0, // Provide a default value if id is undefined
+      // };
+      
+      //type assertion:
+      const updatedMetronome = {
+        ...(matchingTitle as MetronomeItem),
+        ...metronome,
+      };
+      console.log('attempting update with: ', updatedMetronome)
+      const savedUpdatedMetronome = await metronomesService.update(updatedMetronome, user.token);
+      onUpdateSuccess(savedUpdatedMetronome);
+      handleClose();
+      setConfirmationDialogOpen(false); // Close the confirmation dialog
+    } catch (error) {
+      console.log('UPDATE FAILED', error)
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('saving metronome...', metronome);
     try {
-      const matchingTitle = findMatchingTitle(metronome.title, metronomeData);
-      console.log("match?", matchingTitle)
-      if (!matchingTitle) {
+      const matchingTitleResult = findMatchingTitle(metronome.title, metronomeData);
+      console.log("match?", matchingTitleResult)
+      if (!matchingTitleResult) {
         const savedMetronome = await metronomesService.create(metronome, user.token)
         console.log('good save:', savedMetronome)
         onSaveSuccess(savedMetronome);
+        handleClose();
       } else {
-        const updatedMetronome = {...matchingTitle, ...metronome}
-        console.log('attempting update with: ', updatedMetronome)
-        const savedUpdatedMetronome = await metronomesService.update(updatedMetronome, user.token)
-        onUpdateSuccess(savedUpdatedMetronome);
+        // If a matching title is found, show the confirmation dialog
+        setMatchingTitle(matchingTitleResult);
+        setConfirmationDialogOpen(true);
       }
-      handleClose();
+
     } catch (error) {
       console.log('SAVE FAILED', error)
     }
@@ -73,6 +97,22 @@ const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose, onSaveSuccess, o
           </Button>
         </DialogActions>
       </form>
+
+      {/* Confirmation dialog for overwriting */}
+      <Dialog open={confirmationDialogOpen} onClose={() => setConfirmationDialogOpen(false)}>
+        <DialogTitle>{`Overwrite "${metronome.title}"?`}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">This action cannot be undone.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmationDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleOverwriteConfirm} color="primary">
+            Overwrite
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   )
 }
