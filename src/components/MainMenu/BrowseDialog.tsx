@@ -24,7 +24,7 @@ const BrowseDialog: React.FC<BrowseDialogProps> = ({ open, onClose, metronomeDat
     key: 'title',
     direction: 'asc',
   });
-  const isMobile = useMediaQuery('(max-width: 600px)'); // Define your mobile breakpoint here
+  const isMobile = useMediaQuery('(max-width: 440px)'); // Define your mobile breakpoint here
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Metronome Item to Delete
