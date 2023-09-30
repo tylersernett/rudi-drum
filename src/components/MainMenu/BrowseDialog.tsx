@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, IconButton, Button, TableSortLabel, Typography, useMediaQuery } from '@mui/material';
+import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, IconButton, Button, TableSortLabel, Typography, useMediaQuery, Dialog } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import metronomesService from '../../services/metronomes';
 import { useUserContext } from '../../context/UserContext';
@@ -9,7 +9,12 @@ import { Direction } from '../../types';
 import SortableTableHead from './SortableTableHead';
 import DeleteDialog from './DeleteDialog';
 
-const LoadMenu = () => {
+interface BrowseDialogProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const BrowseDialog: React.FC<BrowseDialogProps> = ({open, onClose}) => {
   const { user } = useUserContext();
   const { setMetronome } = useMetronomeContext();
   const [metronomeLoaded, setMetronomeLoaded] = useState(false);
@@ -96,48 +101,50 @@ const LoadMenu = () => {
   });
 
   return (
-    <TableContainer component={Paper}>
-      <Table size="small" sx={{ backgroundColor: '#2f2f2f' }}>
-        <SortableTableHead sortConfig={sortConfig} handleSort={handleSort} isMobile={isMobile} />
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <TableContainer component={Paper}>
+        <Table size="small" sx={{ backgroundColor: '#2f2f2f' }}>
+          <SortableTableHead sortConfig={sortConfig} handleSort={handleSort} isMobile={isMobile} />
 
-        <TableBody>
-          {(metronomeLoaded && sortedMetronomeData.length === 0) ?
-            <TableRow><TableCell>Nothing saved yet</TableCell></TableRow>
-            :
-            <>
-              {sortedMetronomeData.map((metronomeItem: MetronomeItem) => (
-                <TableRow key={metronomeItem.id}>
-                  <TableCell onClick={() => handleLoad(metronomeItem)}>
-                    <Button variant="contained" size="small">
-                      {metronomeItem.title}
-                    </Button>
-                  </TableCell>
-                  <TableCell onClick={() => handleLoad(metronomeItem)}>
-                    {metronomeItem.bpm}
-                  </TableCell>
-                  {!isMobile && (
+          <TableBody>
+            {(metronomeLoaded && sortedMetronomeData.length === 0) ?
+              <TableRow><TableCell>Nothing saved yet</TableCell></TableRow>
+              :
+              <>
+                {sortedMetronomeData.map((metronomeItem: MetronomeItem) => (
+                  <TableRow key={metronomeItem.id}>
                     <TableCell onClick={() => handleLoad(metronomeItem)}>
-                      {metronomeItem.subdivisions}
+                      <Button variant="contained" size="small" sx={{ textTransform: 'none' }} >
+                        {metronomeItem.title}
+                      </Button>
                     </TableCell>
-                  )}
-                  <TableCell onClick={() => handleDelete(metronomeItem)}>
-                    <IconButton color='primary'>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </>
-          }
-        </TableBody>
-      </Table>
-      <DeleteDialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        onConfirmDelete={handleConfirmDelete}
-      />
-    </TableContainer>
+                    <TableCell >
+                      {metronomeItem.bpm}
+                    </TableCell>
+                    {!isMobile && (
+                      <TableCell >
+                        {metronomeItem.subdivisions}
+                      </TableCell>
+                    )}
+                    <TableCell onClick={() => handleDelete(metronomeItem)}>
+                      <IconButton color='primary'>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            }
+          </TableBody>
+        </Table>
+        <DeleteDialog
+          open={isDeleteDialogOpen}
+          onClose={handleCloseDeleteDialog}
+          onConfirmDelete={handleConfirmDelete}
+        />
+      </TableContainer>
+    </Dialog>
   );
 };
 
-export default LoadMenu
+export default BrowseDialog
