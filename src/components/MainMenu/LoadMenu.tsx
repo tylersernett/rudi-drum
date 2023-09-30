@@ -12,6 +12,7 @@ import DeleteDialog from './DeleteDialog';
 const LoadMenu = () => {
   const { user } = useUserContext();
   const { setMetronome } = useMetronomeContext();
+  const [metronomeLoaded, setMetronomeLoaded] = useState(false);
   const [metronomeData, setMetronomeData] = useState([]);
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: Direction }>({
     key: 'title',
@@ -27,9 +28,11 @@ const LoadMenu = () => {
     const fetchData = async () => {
       try {
         if (user && user.token) {
+          setMetronomeLoaded(false);
           const data = await metronomesService.getOwn(user.token);
           console.log('Fetched metronome data:', data);
           setMetronomeData(data);
+          setMetronomeLoaded(true);
         }
       } catch (error) {
         console.error('Error fetching metronome data:', error);
@@ -96,29 +99,36 @@ const LoadMenu = () => {
     <TableContainer component={Paper}>
       <Table size="small" sx={{ backgroundColor: '#2f2f2f' }}>
         <SortableTableHead sortConfig={sortConfig} handleSort={handleSort} isMobile={isMobile} />
+
         <TableBody>
-          {sortedMetronomeData.map((metronomeItem: MetronomeItem) => (
-            <TableRow key={metronomeItem.id}>
-              <TableCell onClick={() => handleLoad(metronomeItem)}>
-                <Button variant="contained" size="small">
-                  {metronomeItem.title}
-                </Button>
-              </TableCell>
-              <TableCell onClick={() => handleLoad(metronomeItem)}>
-                {metronomeItem.bpm}
-              </TableCell>
-              {!isMobile && (
-                <TableCell onClick={() => handleLoad(metronomeItem)}>
-                  {metronomeItem.subdivisions}
-                </TableCell>
-              )}
-              <TableCell onClick={() => handleDelete(metronomeItem)}>
-                <IconButton color='primary'>
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
+          {(metronomeLoaded && sortedMetronomeData.length === 0) ?
+            <TableRow><TableCell>Nothing saved yet</TableCell></TableRow>
+            :
+            <>
+              {sortedMetronomeData.map((metronomeItem: MetronomeItem) => (
+                <TableRow key={metronomeItem.id}>
+                  <TableCell onClick={() => handleLoad(metronomeItem)}>
+                    <Button variant="contained" size="small">
+                      {metronomeItem.title}
+                    </Button>
+                  </TableCell>
+                  <TableCell onClick={() => handleLoad(metronomeItem)}>
+                    {metronomeItem.bpm}
+                  </TableCell>
+                  {!isMobile && (
+                    <TableCell onClick={() => handleLoad(metronomeItem)}>
+                      {metronomeItem.subdivisions}
+                    </TableCell>
+                  )}
+                  <TableCell onClick={() => handleDelete(metronomeItem)}>
+                    <IconButton color='primary'>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </>
+          }
         </TableBody>
       </Table>
       <DeleteDialog
