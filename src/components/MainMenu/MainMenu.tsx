@@ -3,8 +3,8 @@ import { ClickAwayListener, IconButton, Menu, MenuItem, Tooltip, Popover } from 
 import MenuIcon from '@mui/icons-material/Menu';
 import { useUserContext } from '../../context/UserContext';
 import { useMetronomeContext } from "../../context/MetronomeContext";
-import SaveDialog from '../SaveDialog';
-import LoadMenu from './LoadMenu';
+import SaveDialog from './SaveDialog';
+import BrowseDialog from './BrowseDialog';
 import SignUpDialog from './SignUpDialog';
 import usersService from '../../services/users';
 import loginService from '../../services/login';
@@ -17,7 +17,8 @@ const MainMenu = () => {
   const [isSaveDialogOpen, setSaveDialogOpen] = useState(false); // State to control the dialog open/close
   const [isSignUpDialogOpen, setSignUpDialogOpen] = useState(false);
   // const [openMetronomeTable, setOpenMetronomeTable] = useState(false); // State to control the metronome table visibility
-  const [anchorPopover, setAnchorPopover] = useState<null | HTMLElement>(null); // State to control the popover open/close
+  const [isBrowseDialogOpen, setBrowseDialogOpen] = useState(false);
+
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -44,27 +45,31 @@ const MainMenu = () => {
 
   const handleOpenSaveDialog = () => {
     setSaveDialogOpen(true);
+    handleClose();
   }
 
   const handleCloseSaveDialog = () => {
     setSaveDialogOpen(false);
   };
 
-  const handleBrowsePatterns = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorPopover(event.currentTarget); // Open the popover
-  };
-
-  const handleClosePopover = () => {
-    setAnchorPopover(null); // Close the popover
-  };
-
   const handleOpenSignUpDialog = () => {
     setSignUpDialogOpen(true);
+    handleClose();
   };
 
   const handleCloseSignUpDialog = () => {
     setSignUpDialogOpen(false);
   };
+
+  const handleOpenBrowsePatternsDialog = () => {
+    setBrowseDialogOpen(true);
+    handleClose();
+  };
+
+  const handleCloseBrowsePatternsDialog = () => {
+    setBrowseDialogOpen(false);
+  };
+
 
   const handleSignUp = async (username: string, password: string) => {
     try {
@@ -102,7 +107,7 @@ const MainMenu = () => {
           <MenuItem onClick={handleClose}>Advanced Settings</MenuItem>
           <MenuItem onClick={handleResetPattern}>Reset Pattern</MenuItem>
           {/* <MenuItem key="load" onClick={handleLoadPattern} >Load Pattern</MenuItem> */}
-          <MenuItem onClick={handleBrowsePatterns} >Browse Patterns</MenuItem>
+          <MenuItem onClick={handleOpenBrowsePatternsDialog} >Browse Patterns</MenuItem>
           <MenuItem key="save" onClick={handleOpenSaveDialog} >Save Pattern</MenuItem>
         </Menu>
       ) : (
@@ -132,24 +137,9 @@ const MainMenu = () => {
         </Menu >
       )}
 
+      <BrowseDialog open={isBrowseDialogOpen} onClose={handleCloseBrowsePatternsDialog} />
       <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} />
       <SignUpDialog open={isSignUpDialogOpen} onClose={handleCloseSignUpDialog} onSignUp={handleSignUp} />
-      {/* Popover for Browse Patterns */}
-      <Popover
-        open={Boolean(anchorPopover)}
-        anchorEl={anchorPopover}
-        onClose={handleClosePopover}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        <LoadMenu />
-      </Popover>
     </>
   )
 }
