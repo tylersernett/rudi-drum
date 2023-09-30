@@ -10,10 +10,16 @@ interface SignUpDialogProps {
 const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSignUp }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     // Call the onSignUp callback with the entered username and password
+    if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters long');
+      return;
+    }
+    // Clear any previous password error
+    setPasswordError(null);
     onSignUp(username, password);
   };
 
@@ -21,10 +27,11 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSignUp }) 
     // Reset username and password when the component mounts
     setUsername('');
     setPassword('');
+    setPasswordError(null);
   }, [open]);
 
   return (
-    <Dialog open={open} onClose={onClose} disableRestoreFocus>
+    <Dialog open={open} onClose={onClose} disableRestoreFocus sx={{width:'440px', maxWidth:'100%', margin:'auto'}}>
       <form onSubmit={handleSignUp}>
         <DialogTitle>New User Sign Up</DialogTitle>
         <DialogContent>
@@ -39,6 +46,8 @@ const SignUpDialog: React.FC<SignUpDialogProps> = ({ open, onClose, onSignUp }) 
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
+            error={!!passwordError}
+            helperText={passwordError}
             margin="dense"
             id="password"
             label="Password"
