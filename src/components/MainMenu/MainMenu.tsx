@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ClickAwayListener, IconButton, Menu, MenuItem, Tooltip, Popover } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useUserContext } from '../../context/UserContext';
@@ -7,11 +7,14 @@ import SaveDialog from './SaveDialog';
 import BrowseDialog from './BrowseDialog';
 import SignUpDialog from './SignUpDialog';
 import usersService from '../../services/users';
-import loginService from '../../services/login';
+import metronomesService from '../../services/metronomes';
+import { MetronomeItem } from '../../context/MetronomeContext';
 
 const MainMenu = () => {
   const { user } = useUserContext();
   const { metronome, setMetronome, resetMetronome } = useMetronomeContext();
+  const [metronomeLoaded, setMetronomeLoaded] = useState(false);
+  const [metronomeData, setMetronomeData] = useState<MetronomeItem[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [isSaveDialogOpen, setSaveDialogOpen] = useState(false); // State to control the dialog open/close
@@ -19,6 +22,24 @@ const MainMenu = () => {
   // const [openMetronomeTable, setOpenMetronomeTable] = useState(false); // State to control the metronome table visibility
   const [isBrowseDialogOpen, setBrowseDialogOpen] = useState(false);
 
+  //LOAD IN THE METRONOME DATA
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (user && user.token) {
+          setMetronomeLoaded(false);
+          const data = await metronomesService.getOwn(user.token);
+          console.log('Fetched metronome data:', data);
+          setMetronomeData(data);
+          setMetronomeLoaded(true);
+        }
+      } catch (error) {
+        console.error('Error fetching metronome data:', error);
+      }
+    };
+
+    fetchData();
+  }, [user]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -32,16 +53,6 @@ const MainMenu = () => {
     console.log('resetting pattern...')
     resetMetronome();
   }
-  const handleLoadPattern = () => {
-    const testBpm = 163
-    const testSub = 3
-    const testBlink = false;
-    console.log('loading pattern...')
-    setMetronome({ title: 'test', bpm: testBpm, subdivisions: testSub, blinkToggle: testBlink })
-  }
-  // const handleSavePattern = () => {
-  //   console.log('saving pattern...', metronome)
-  // }
 
   const handleOpenSaveDialog = () => {
     setSaveDialogOpen(true);
@@ -50,6 +61,11 @@ const MainMenu = () => {
 
   const handleCloseSaveDialog = () => {
     setSaveDialogOpen(false);
+  };
+
+  const handleSaveSuccess = (updatedData:MetronomeItem) => {
+    // Update metronomeData with the updated data
+    setMetronomeData((prevData) => [...prevData, updatedData]);
   };
 
   const handleOpenSignUpDialog = () => {
@@ -137,8 +153,8 @@ const MainMenu = () => {
         </Menu >
       )}
 
-      <BrowseDialog open={isBrowseDialogOpen} onClose={handleCloseBrowsePatternsDialog} />
-      <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} />
+      <BrowseDialog open={isBrowseDialogOpen} onClose={handleCloseBrowsePatternsDialog} metronomeData={metronomeData} setMetronomeData={setMetronomeData} metronomeLoaded={metronomeLoaded}/>
+      <SaveDialog open={isSaveDialogOpen} onClose={handleCloseSaveDialog} onSaveSuccess={handleSaveSuccess} />
       <SignUpDialog open={isSignUpDialogOpen} onClose={handleCloseSignUpDialog} onSignUp={handleSignUp} />
     </>
   )

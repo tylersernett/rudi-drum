@@ -3,13 +3,15 @@ import { useState } from "react";
 import { useMetronomeContext } from "../../context/MetronomeContext";
 import metronomesService from '../../services/metronomes';
 import { useUserContext } from "../../context/UserContext";
+import { MetronomeItem } from "../../context/MetronomeContext";
 
 interface SaveDialogProps {
   open: boolean;
   onClose: () => void;
+  onSaveSuccess: (updatedData: MetronomeItem) => void;
 }
 
-const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose }) => {
+const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose, onSaveSuccess }) => {
   const { metronome, setMetronome } = useMetronomeContext();
   const { user } = useUserContext();
   // const [savePatternTitle, setSavePatternTitle] = useState(""); // State to store the pattern title
@@ -25,6 +27,7 @@ const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose }) => {
     try {
       const savedMetronome = await metronomesService.create(metronome, user.token)
       console.log('good save:', savedMetronome)
+      onSaveSuccess(savedMetronome);
       handleClose();
     } catch (error) {
       console.log('SAVE FAILED', error)
