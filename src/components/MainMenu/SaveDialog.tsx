@@ -1,8 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useState } from "react";
-import { useMetronomeContext } from "../context/MetronomeContext";
-import metronomesService from '../services/metronomes';
-import { useUserContext } from "../context/UserContext";
+import { useMetronomeContext } from "../../context/MetronomeContext";
+import metronomesService from '../../services/metronomes';
+import { useUserContext } from "../../context/UserContext";
 
 interface SaveDialogProps {
   open: boolean;
@@ -25,17 +25,14 @@ const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose }) => {
     try {
       const savedMetronome = await metronomesService.create(metronome, user.token)
       console.log('good save:', savedMetronome)
-      // setUserInfo(savedMetronome.username, savedMetronome.token)
-      // setMetronome(savedMetronome);
       handleClose();
     } catch (error) {
-      // setError('Login failed. Please check your credentials.');
       console.log('SAVE FAILED', error)
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} disableRestoreFocus>
       <form onSubmit={handleSubmit}>
         <DialogTitle>Save Pattern</DialogTitle>
         <DialogContent>
