@@ -69,7 +69,7 @@ const Metronome = () => {
     // }, "4n").start(restartTime + Tone.Transport.toSeconds("20n"))
   }
 
-  const handleSliderChange = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
+  const handleSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
     processSliderValue(newValue, (newBpm) => {
       setMetronome({
         ...metronome,
@@ -77,7 +77,7 @@ const Metronome = () => {
       });
     });
   };
-  const handleSliderCommit = (event: React.SyntheticEvent | Event, newValue: number | number[]) => {
+  const handleSliderCommit = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
     processSliderValue(newValue, (newBpm) => {
       setMetronome({
         ...metronome,
@@ -114,7 +114,7 @@ const Metronome = () => {
     if (sampler.current) console.log(sampler?.current.volume)
   }
 
-  const handleVolumeChange = (event: React.SyntheticEvent | Event, value: number | number[]) => {
+  const handleVolumeChange = (_event: React.SyntheticEvent | Event, value: number | number[]) => {
     if (typeof value === "number") {
       const volumeValue = mapToDecibels(value); // Convert to decibels
       setVolume(value);
