@@ -1,27 +1,5 @@
-DDR:
-Marvelous: +/- 16.7 ms (+/- One Frame)
-Perfect: +/- 33 ms (+/- Two Frames)
-Great: +/- 92 ms (+/- 5.5 Frames)
-Good: +/- 142 ms (+/- 8.5 Frames)
-Boo: +/- 225 ms (+/- 13.5 Frames)
-
-Perfect: -8 ms / +24 ms
-Great: -16 ms / +38 ms
-Good: -24 ms / +64 ms
-Bad: -36 ms / +92 ms
-
-TODO: changeable tones, tap tempo, volume meter
-login, save
-
-grade: downbeat vs subdivisions
-
-'drill' vs 'bpm'
-{
-   name: drillName
-   data: {
-      toneData
-   }
-}
+# Live Deployment
+https://tylersernett.github.io/rudi-drum
 
 
 # React + TypeScript + Vite
