@@ -54,7 +54,8 @@ const Metronome = () => {
 
     console.log("SEQ: ", sequence.current); //sequence.current.part.events[0]
 
-    const drawLoop = new Tone.Loop((time) => {
+    // const drawLoop = 
+    new Tone.Loop((time) => {
       Tone.Draw.schedule(() => {
         setIsBlinking(true)
       }, time) //use AudioContext time of the event
