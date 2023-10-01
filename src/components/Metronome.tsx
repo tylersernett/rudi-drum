@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
-import { Box, Slider, Typography, Button, Grid, Input } from "@mui/material";
+import { useState, useEffect, useRef, } from "react";
+import { Box, Slider, Typography, Button, Grid, } from "@mui/material";
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import * as Tone from 'tone';

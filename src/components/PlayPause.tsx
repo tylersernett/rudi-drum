@@ -1,5 +1,5 @@
-import { useState, Dispatch, SetStateAction } from "react";
-import { Box, Slider, Typography, Button } from "@mui/material";
+import { useState, } from "react";
+import { Box, Button } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import * as Tone from 'tone';

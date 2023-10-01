@@ -1,6 +1,6 @@
 // import { useState, useEffect, useMemo, useRef } from "react";
 // import * as Tone from 'tone';
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, } from "react";
 import { Box, Switch, Typography } from "@mui/material";
 import { useMetronomeContext } from "../context/MetronomeContext";
 

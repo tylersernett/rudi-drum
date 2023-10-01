@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Typography, AppBar, Container, Toolbar, Button, } from "@mui/material";
-import { theme } from "../theme";
+import { Typography, AppBar, Toolbar, Button, } from "@mui/material";
 import LoginModal from "./LoginModal";
 import { useUserContext } from '../context/UserContext';
 import MainMenu from "./MainMenu";

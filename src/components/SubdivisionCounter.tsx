@@ -1,11 +1,9 @@
-import { useEffect, Dispatch, SetStateAction, MutableRefObject } from "react";
+import { useEffect } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import * as Tone from 'tone';
-import Sequence from 'tone';
 import { useMetronomeContext } from "../context/MetronomeContext";
-
 
 interface SubdivisionCounterProps {
   restartSequence: (restartTime?: number) => void;

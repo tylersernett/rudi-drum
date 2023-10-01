@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, IconButton, Button, TableSortLabel, Typography, useMediaQuery, Dialog } from '@mui/material';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { TableContainer, Table, TableBody, TableRow, TableCell, Paper, IconButton, Button, useMediaQuery, Dialog } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import metronomesService from '../../services/metronomes';
 import { useUserContext } from '../../context/UserContext';
@@ -34,6 +34,7 @@ const BrowseDialog: React.FC<BrowseDialogProps> = ({ open, onClose, metronomeDat
     console.log('Clicked on row, metronome data:', metronomeItem);
     const { title, bpm, subdivisions, blinkToggle } = metronomeItem;
     setMetronome({ title, bpm, subdivisions, blinkToggle });
+    onClose(); //000 could be a settings switch? "autoclosemenu"
   };
 
   const handleDelete = (metronomeItem: MetronomeItem) => {

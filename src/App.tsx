@@ -1,5 +1,5 @@
-import reactLogo from './assets/react.svg';
-import { Box, Container, Typography } from '@mui/material';
+// import reactLogo from './assets/react.svg';
+import { Typography } from '@mui/material';
 import './App.css';
 import Metronome from './components/Metronome';
 import TopBar from './components/TopBar';
