@@ -4,9 +4,11 @@ import LoginModal from "./LoginModal";
 import { useUserContext } from '../context/UserContext';
 import MainMenu from "./MainMenu";
 import UserMenu from "./UserMenu";
+import { useMetronomeContext } from "../context/MetronomeContext";
 
 const TopBar = () => {
   const { user } = useUserContext();
+  const {metronome} = useMetronomeContext();
   const [openLoginModal, setOpenLoginModal] = useState(false);
 
   const handleOpenLoginModal = () => {
@@ -22,7 +24,7 @@ const TopBar = () => {
       <Toolbar >
         <MainMenu />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Placeholder
+          {metronome.title}
         </Typography>
         {user.username ? (
           <UserMenu />
