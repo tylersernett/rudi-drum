@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, } from "react";
-import { Box, Slider, Typography, Button, Grid, } from "@mui/material";
+import { Box, Slider, Typography, Grid, } from "@mui/material";
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import * as Tone from 'tone';
@@ -7,7 +7,7 @@ import tickSound from "../assets/Synth_Sine_C_lo.wav";
 import tickSoundDown from "../assets/Synth_Sine_C_hi.wav";
 import Blinker from "./Blinker";
 import SubdivisionCounter from "./SubdivisionCounter";
-import Grader from "./Grader";
+// import Grader from "./Grader";
 import PlayPause from "./PlayPause";
 import { useMetronomeContext } from "../context/MetronomeContext";
 
@@ -96,23 +96,37 @@ const Metronome = () => {
 
   useEffect(() => {
     const buttonElement = document.getElementById('starter');
-    if (buttonElement) {
-      const clickHandler = async () => {
+  
+    const asyncClickHandler = async () => {
+      try {
         await Tone.start();
         console.log('audio is ready');
-        console.log(Tone.getTransport())
+        console.log(Tone.getTransport());
+      } catch (error) {
+        console.error('Error starting audio:', error);
+      }
+    };
+  
+    if (buttonElement) {
+      const clickHandler = () => {
+        asyncClickHandler().catch((error) => {
+          console.error('Async click handler failed:', error);
+        });
       };
+  
       buttonElement.addEventListener('click', clickHandler);
-
+  
       return () => {
         buttonElement.removeEventListener('click', clickHandler);
       };
     }
   }, []);
+  
+  
 
-  const handleHelp = () => {
-    if (sampler.current) console.log(sampler?.current.volume)
-  }
+  // const handleHelp = () => {
+  //   if (sampler.current) console.log(sampler?.current.volume)
+  // }
 
   const handleVolumeChange = (_event: React.SyntheticEvent | Event, value: number | number[]) => {
     if (typeof value === "number") {
