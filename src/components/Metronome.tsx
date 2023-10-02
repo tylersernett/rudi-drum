@@ -170,8 +170,8 @@ const Metronome = () => {
         </Grid>
       </Grid>
 
-      <Button variant='contained' onClick={handleHelp}>Help</Button>
-      <Grader />
+      {/* <Button variant='contained' onClick={handleHelp}>Help</Button> */}
+      {/* <Grader /> */}
     </Box>
   );
 };
