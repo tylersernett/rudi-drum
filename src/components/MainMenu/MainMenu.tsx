@@ -38,8 +38,10 @@ const MainMenu = () => {
       }
     };
 
-    fetchData();
+    //eslint: promise must end with a call to .catch, end with a call to .then with a rejection handler
+    fetchData().then(() => { }).catch(err => console.error(err));
   }, [user]);
+
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
