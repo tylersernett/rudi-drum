@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, TextField, } from '@mui/material';
 import loginService from '../services/login';
 import { useUserContext } from '../context/UserContext';
+
 interface LoginModalProps {
   open: boolean;
   onClose: () => void;
@@ -20,10 +21,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
     onClose();
   };
 
-  const handleLogin = async () => {
-    // ADD SERVER LOGIC !!!
-    console.log('Username:', username);
-    console.log('Password:', password);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       const user = await loginService.login({ username, password })
       console.log('good login:', user)
@@ -35,14 +34,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
       console.log(error)
     }
   }
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleLogin();
-  };
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth='xs' disableRestoreFocus>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
         <DialogTitle>Login</DialogTitle>
         <DialogContent>
           <TextField
