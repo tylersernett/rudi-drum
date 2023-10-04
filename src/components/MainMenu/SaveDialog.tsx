@@ -2,28 +2,28 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, T
 import { useMetronomeContext } from "../../context/MetronomeContext";
 import metronomesService from '../../services/metronomes';
 import { useUserContext } from "../../context/UserContext";
-import { MetronomeItem } from "../../context/MetronomeContext";
+import { MetronomeDBItem } from "../../types";
 import { useState } from "react";
 
 interface SaveDialogProps {
   open: boolean;
   onClose: () => void;
-  onSaveSuccess: (updatedData: MetronomeItem) => void;
-  onUpdateSuccess: (updatedData: MetronomeItem) => void;
-  metronomeData: MetronomeItem[]
+  onSaveSuccess: (updatedData: MetronomeDBItem) => void;
+  onUpdateSuccess: (updatedData: MetronomeDBItem) => void;
+  metronomeData: MetronomeDBItem[]
 }
 
 const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose, onSaveSuccess, onUpdateSuccess, metronomeData }) => {
   const { metronome, setMetronome } = useMetronomeContext();
   const { user } = useUserContext();
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-  const [matchingTitle, setMatchingTitle] = useState<MetronomeItem | null>(null);
+  const [matchingTitle, setMatchingTitle] = useState<MetronomeDBItem | null>(null);
 
   const handleClose = () => {
     onClose();
   }
 
-  const findMatchingTitle = (title: string, metronomeData: MetronomeItem[]) => {
+  const findMatchingTitle = (title: string, metronomeData: MetronomeDBItem[]) => {
     return metronomeData.find((metronomeItem) => metronomeItem.title === title);
   };
 
@@ -35,10 +35,10 @@ const SaveDialog: React.FC<SaveDialogProps> = ({ open, onClose, onSaveSuccess, o
       // ...metronome,
       // id: matchingTitle?.id ?? 0, // Provide a default value if id is undefined
       // };
-      
+
       //type assertion:
       const updatedMetronome = {
-        ...(matchingTitle as MetronomeItem),
+        ...(matchingTitle as MetronomeDBItem),
         ...metronome,
       };
       console.log('attempting update with: ', updatedMetronome)

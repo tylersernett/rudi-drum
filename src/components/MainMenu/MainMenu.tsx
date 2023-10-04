@@ -8,13 +8,13 @@ import BrowseDialog from './BrowseDialog';
 import SignUpDialog from './SignUpDialog';
 import usersService from '../../services/users';
 import metronomesService from '../../services/metronomes';
-import { MetronomeItem } from '../../context/MetronomeContext';
+import { MetronomeDBItem } from '../../types';
 
 const MainMenu = () => {
   const { user } = useUserContext();
   const { resetMetronome } = useMetronomeContext();
   const [metronomeLoaded, setMetronomeLoaded] = useState(false);
-  const [metronomeData, setMetronomeData] = useState<MetronomeItem[]>([]);
+  const [metronomeData, setMetronomeData] = useState<MetronomeDBItem[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [isSaveDialogOpen, setSaveDialogOpen] = useState(false); // State to control the dialog open/close
@@ -38,8 +38,10 @@ const MainMenu = () => {
       }
     };
 
-    fetchData();
+    //eslint: promise must end with a call to .catch, end with a call to .then with a rejection handler
+    fetchData().then(() => { }).catch(err => console.error(err));
   }, [user]);
+
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -63,12 +65,12 @@ const MainMenu = () => {
     setSaveDialogOpen(false);
   };
 
-  const handleSaveSuccess = (updatedData: MetronomeItem) => {
-    setMetronomeData((prevData) => [...prevData, updatedData]);
+  const handleSaveSuccess = (updatedData: MetronomeDBItem) => {
+    setMetronomeData((prevData: MetronomeDBItem[]) => [...prevData, updatedData]);
   };
 
-  const handleUpdateSuccess = (updatedData: MetronomeItem) => {
-    setMetronomeData((prevData) =>
+  const handleUpdateSuccess = (updatedData: MetronomeDBItem) => {
+    setMetronomeData((prevData: MetronomeDBItem[]) =>
       prevData.map((metronomeItem) =>
         metronomeItem.id === updatedData.id ? updatedData : metronomeItem
       )

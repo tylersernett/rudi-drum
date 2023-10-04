@@ -5,6 +5,7 @@ import Metronome from './components/Metronome';
 import TopBar from './components/TopBar';
 import { useEffect } from 'react';
 import { useUserContext } from './context/UserContext';
+import { toNewUser } from './utils';
 
 function App() {
   const { setUser } = useUserContext();
@@ -13,7 +14,8 @@ function App() {
     const loggedUserJSON = window.localStorage.getItem('loggedRudiUser')
     if (loggedUserJSON) {
       console.log('logged user found!', loggedUserJSON)
-      const user = JSON.parse(loggedUserJSON)
+      const obj: unknown = JSON.parse(loggedUserJSON)
+      const user = toNewUser(obj)
       setUser(user)
     }
   }, [])

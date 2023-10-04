@@ -1,15 +1,15 @@
 import axios from 'axios';
 import { API_URL } from '../../config';
-import { IMetronome, MetronomeItem } from '../context/MetronomeContext';
+import { IMetronome, MetronomeDBItem } from '../types';
 
-const create = async (metronome: IMetronome, token: string): Promise<MetronomeItem> => {
+const create = async (metronome: IMetronome, token: string): Promise<MetronomeDBItem> => {
   try {
     const headers = {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
 
-    const response = await axios.post<MetronomeItem>(`${API_URL}/metronomes`, metronome, { headers });
+    const response = await axios.post<MetronomeDBItem>(`${API_URL}/metronomes`, metronome, { headers });
     return response.data;
   } catch (error) {
     console.error('Error creating metronome:', error);
@@ -17,14 +17,14 @@ const create = async (metronome: IMetronome, token: string): Promise<MetronomeIt
   }
 };
 
-const getOwn = async (token: string): Promise<MetronomeItem[]> => {
+const getOwn = async (token: string): Promise<MetronomeDBItem[]> => {
   try {
     const headers = {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
     // const response = await axios.get<MetronomeItem[]>(`${API_URL}/metronomes`, { headers })
-    const response = await axios.get<MetronomeItem[]>(`${API_URL}/metronomes`, { headers })
+    const response = await axios.get<MetronomeDBItem[]>(`${API_URL}/metronomes`, { headers })
     return response.data
   } catch (error) {
     console.error('Error fetching metronomes:', error);
@@ -32,7 +32,7 @@ const getOwn = async (token: string): Promise<MetronomeItem[]> => {
   }
 }
 
-const update = async (metronome: MetronomeItem, token: string): Promise<MetronomeItem> => {
+const update = async (metronome: MetronomeDBItem, token: string): Promise<MetronomeDBItem> => {
   console.log('attempting update of: ', metronome)
   try {
     const headers = {
@@ -40,7 +40,7 @@ const update = async (metronome: MetronomeItem, token: string): Promise<Metronom
       'Content-Type': 'application/json',
     };
     const id = metronome.id
-    const response = await axios.put<MetronomeItem>(`${API_URL}/metronomes/${id}`, metronome, { headers });
+    const response = await axios.put<MetronomeDBItem>(`${API_URL}/metronomes/${id}`, metronome, { headers });
     return response.data;
   } catch (error) {
     console.error('Error updating metronome:', error);
