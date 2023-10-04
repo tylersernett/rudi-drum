@@ -15,16 +15,17 @@ const UserMenu = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = async () => {
-    console.log('LOGOUT attempt')
+  const handleLogout: () => Promise<void> = async () => {
+    console.log('LOGOUT attempt');
     try {
-      await logoutService.logout(user.token)
-      console.log('logout success')
-      clearUserInfo()
-      window.localStorage.removeItem('loggedRudiUser')
+      await logoutService.logout(user.token);
+      console.log('logout success');
     } catch (error) {
-      console.log('error logging out', error)
+      console.log('error logging out', error);
     }
+    // Remove local storage & clear User regardless of server response
+    clearUserInfo();
+    window.localStorage.removeItem('loggedRudiUser');
   };
 
   return (
