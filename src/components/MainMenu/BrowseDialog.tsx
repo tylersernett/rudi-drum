@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import metronomesService from '../../services/metronomes';
 import { useUserContext } from '../../context/UserContext';
 import { useMetronomeContext } from '../../context/MetronomeContext';
-import { MetronomeItem } from '../../context/MetronomeContext';
+import { MetronomeDBItem } from '../../types';
 import { Direction } from '../../types';
 import SortableTableHead from './SortableTableHead';
 import DeleteDialog from './DeleteDialog';
@@ -12,8 +12,8 @@ import DeleteDialog from './DeleteDialog';
 interface BrowseDialogProps {
   open: boolean;
   onClose: () => void;
-  metronomeData: MetronomeItem[];
-  setMetronomeData: Dispatch<SetStateAction<MetronomeItem[]>>;
+  metronomeData: MetronomeDBItem[];
+  setMetronomeData: Dispatch<SetStateAction<MetronomeDBItem[]>>;
   metronomeLoaded: boolean;
 }
 
@@ -28,16 +28,16 @@ const BrowseDialog: React.FC<BrowseDialogProps> = ({ open, onClose, metronomeDat
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Metronome Item to Delete
-  const [metronomeToDelete, setMetronomeToDelete] = useState<MetronomeItem | null>(null);
+  const [metronomeToDelete, setMetronomeToDelete] = useState<MetronomeDBItem | null>(null);
 
-  const handleLoad = (metronomeItem: MetronomeItem) => {
+  const handleLoad = (metronomeItem: MetronomeDBItem) => {
     console.log('Clicked on row, metronome data:', metronomeItem);
     const { title, bpm, subdivisions, blinkToggle } = metronomeItem;
     setMetronome({ title, bpm, subdivisions, blinkToggle });
     onClose(); //000 could be a settings switch? "autoclosemenu"
   };
 
-  const handleDelete = (metronomeItem: MetronomeItem) => {
+  const handleDelete = (metronomeItem: MetronomeDBItem) => {
     console.log('Clicked trash, metronome data:', metronomeItem);
     setMetronomeToDelete(metronomeItem);
     setDeleteDialogOpen(true);
@@ -76,7 +76,7 @@ const BrowseDialog: React.FC<BrowseDialogProps> = ({ open, onClose, metronomeDat
 
   const sortedMetronomeData = [...metronomeData].sort((a, b) => {
     // Type assertion to tell TypeScript that `key` is a valid property
-    const key = sortConfig.key as keyof MetronomeItem;
+    const key = sortConfig.key as keyof MetronomeDBItem;
     if (a[key] < b[key]) return sortConfig.direction === 'asc' ? -1 : 1;
     if (a[key] > b[key]) return sortConfig.direction === 'asc' ? 1 : -1;
     return 0;
@@ -93,7 +93,7 @@ const BrowseDialog: React.FC<BrowseDialogProps> = ({ open, onClose, metronomeDat
               <TableRow><TableCell>Nothing saved yet</TableCell></TableRow>
               :
               <>
-                {sortedMetronomeData.map((metronomeItem: MetronomeItem) => (
+                {sortedMetronomeData.map((metronomeItem: MetronomeDBItem) => (
                   <TableRow key={metronomeItem.id}>
                     <TableCell onClick={() => handleLoad(metronomeItem)}>
                       <Button variant="contained" size="small" sx={{ textTransform: 'none' }} >

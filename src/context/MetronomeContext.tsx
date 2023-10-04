@@ -1,18 +1,6 @@
 import { ReactNode, createContext, useContext, useState, Dispatch, SetStateAction } from "react";
+import { IMetronome, } from "../types";
 
-export interface IMetronome {
-  title: string;
-  bpm: number;
-  subdivisions: number;
-  blinkToggle: boolean;
-}
-
-export interface MetronomeItem extends IMetronome{
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  user: { username: string };
-}
 
 type MetronomeContextType = {
   metronome: IMetronome,

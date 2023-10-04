@@ -1,9 +1,6 @@
 import { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
+import { IUser } from '../types';
 
-export interface IUser {
-  username: string;
-  token: string;
-}
 
 type UserContextType = {
   user: IUser;
