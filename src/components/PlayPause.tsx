@@ -14,11 +14,16 @@ const PlayPause: React.FC<PlayPauseProps> = ({ restartSequence, isLoaded }) => {
 
   const handlePlayClick = () => {
     if (!isPlaying) {
+      //only runs the FIRST time play is clicked
       if (Tone.Transport.state !== "started") {
         Tone.Transport.start("+0.1"); //start 100 ms in future to avoid initial pops
       }
+      
       restartSequence();
-    } else {
+    } else { //PAUSE
+      console.log('cancel??')
+      Tone.Draw.cancel();
+      Tone.Transport.cancel();
       Tone.Transport.stop();
     }
     setIsPlaying(!isPlaying)
