@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, } from "react";
-import { Box, Slider, Typography, Grid, } from "@mui/material";
+import { Box, Slider, Typography, Grid, Button, } from "@mui/material";
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import * as Tone from 'tone';
@@ -10,16 +10,31 @@ import SubdivisionCounter from "./SubdivisionCounter";
 // import Grader from "./Grader";
 import PlayPause from "./PlayPause";
 import { useMetronomeContext } from "../context/MetronomeContext";
+import { TimeObject } from "tone/build/esm/core/type/Units";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
-  const [isBlinking, setIsBlinking] = useState(false);
+  // const [isBlinking, setIsBlinking] = useState(false);
   const { metronome, setMetronome } = useMetronomeContext();
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
   const [volume, setVolume] = useState(100);
 
   const { bpm, subdivisions } = metronome;
+  const [isBlinking, setIsBlinking] = useState<boolean[]>(() => {
+    return Array.from({ length: metronome.subdivisions }, () => false);
+  });
+
+  // useEffect(() => {
+  //   setIsBlinking((prevIsBlinking) => {
+  //     // Update the size of isBlinking array when subdivisions change
+  //     const newIsBlinking = [...prevIsBlinking].slice(0, subdivisions);
+  //     while (newIsBlinking.length < subdivisions) {
+  //       newIsBlinking.push(false);
+  //     }
+  //     return newIsBlinking;
+  //   });
+  // }, [subdivisions]);
 
   useEffect(() => {
     sampler.current = new Tone.Sampler({
@@ -43,7 +58,9 @@ const Metronome = () => {
 
   const restartSequence = (restartTime = 0) => {
     Tone.Transport.cancel();
-    const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3");
+    Tone.Draw.cancel();
+    console.log("subs:", subdivisions, "arrLen: ", isBlinking.length)
+    const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3"); //the notes NOT on the downbeat
     sequence.current = new Tone.Sequence((time, note) => {
       if (sampler.current) {
         sampler.current.triggerAttackRelease(note, "32n", time);
@@ -55,18 +72,26 @@ const Metronome = () => {
     console.log("SEQ: ", sequence.current); //sequence.current.part.events[0]
 
     // const drawLoop = 
+
     new Tone.Loop((time) => {
-      Tone.Draw.schedule(() => {
-        setIsBlinking(true)
-      }, time) //use AudioContext time of the event
+      for (let i = 0; i < subdivisions; i++) {
+        const prefix = 4 * subdivisions;
+        const timeStr = `${prefix}n`;
+        //Object, ({"4n" : 3, "8t" : -1}). The resulting time is equal to the sum of all of the keys multiplied by the values in the object.
+        const timeObj = { [timeStr]: i } as TimeObject
+        // console.log(Tone.Time(timeObj))
+        const timeString = i === 0 ? time : time + Tone.Transport.toSeconds(timeObj)
+        Tone.Draw.schedule(() => {
+          setIsBlinking(prevIsBlinking => {
+            const updatedIsBlinking = [...prevIsBlinking];
+            updatedIsBlinking[i] = true;
+            // console.log(updatedIsBlinking)
+            return updatedIsBlinking;
+          })
+        }, timeString) //use AudioContext time of the event
+      }
     }, "4n").start(restartTime)
 
-    //ADD LATER: multiblink
-    // const drawLoop2 = new Tone.Loop((time) => {
-    //   Tone.Draw.schedule(() => {
-    //     setIsBlinking(true)
-    //   }, time) //use AudioContext time of the event
-    // }, "4n").start(restartTime + Tone.Transport.toSeconds("20n"))
   }
 
   const handleSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
@@ -96,7 +121,7 @@ const Metronome = () => {
 
   useEffect(() => {
     const buttonElement = document.getElementById('starter');
-  
+
     const asyncClickHandler = async () => {
       try {
         await Tone.start();
@@ -106,27 +131,28 @@ const Metronome = () => {
         console.error('Error starting audio:', error);
       }
     };
-  
+
     if (buttonElement) {
       const clickHandler = () => {
         asyncClickHandler().catch((error) => {
           console.error('Async click handler failed:', error);
         });
       };
-  
+
       buttonElement.addEventListener('click', clickHandler);
-  
+
       return () => {
         buttonElement.removeEventListener('click', clickHandler);
       };
     }
   }, []);
-  
-  
 
-  // const handleHelp = () => {
-  //   if (sampler.current) console.log(sampler?.current.volume)
-  // }
+
+
+  const handleHelp = () => {
+    // if (sampler.current) console.log(sampler?.current.volume)
+    console.log(isBlinking)
+  }
 
   const handleVolumeChange = (_event: React.SyntheticEvent | Event, value: number | number[]) => {
     if (typeof value === "number") {
@@ -151,8 +177,18 @@ const Metronome = () => {
   return (
     <Box className="metronome">
       <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
-      <Blinker isBlinking={isBlinking} setIsBlinking={setIsBlinking} />
-      <SubdivisionCounter restartSequence={restartSequence} />
+      <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+        {isBlinking.map((blinking, index) => (
+          <Blinker key={index} isBlinking={blinking} setIsBlinking={(newBlinking) => {
+            setIsBlinking((prevIsBlinking) => {
+              const updatedIsBlinking = [...prevIsBlinking];
+              updatedIsBlinking[index] = newBlinking;
+              return updatedIsBlinking;
+            });
+          }} />
+        ))}
+      </Box>
+      <SubdivisionCounter restartSequence={restartSequence} setIsBlinking={setIsBlinking} />
 
       <Box mt={1} display='flex' alignItems='center' sx={{ width: '250px', }}>
         <Typography variant="body1" mr={2} sx={{ flexShrink: 0, }} >BPM</Typography>
@@ -184,9 +220,9 @@ const Metronome = () => {
         </Grid>
       </Grid>
 
-      {/* <Button variant='contained' onClick={handleHelp}>Help</Button> */}
+      <Button variant='contained' onClick={handleHelp}>Help</Button>
       {/* <Grader /> */}
-    </Box>
+    </Box >
   );
 };
 

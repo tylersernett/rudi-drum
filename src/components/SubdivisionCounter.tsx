@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -7,10 +7,11 @@ import { useMetronomeContext } from "../context/MetronomeContext";
 
 interface SubdivisionCounterProps {
   restartSequence: (restartTime?: number) => void;
+  setIsBlinking: Dispatch<SetStateAction<boolean[]>>;
   // sequence: MutableRefObject<Sequence<any> | null>;
 }
 
-const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence, }) => {
+const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence, setIsBlinking }) => {
   const { metronome, setMetronome } = useMetronomeContext();
   const { subdivisions } = metronome;
   const subMin = 1;
@@ -23,6 +24,14 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence
   // Use useEffect to listen for changes in subdivisions
   useEffect(() => {
     if (Tone.Transport.state === "started") {
+      setIsBlinking((prevIsBlinking) => {
+        // Update the size of isBlinking array when subdivisions change
+        const newIsBlinking = [...prevIsBlinking].slice(0, subdivisions);
+        while (newIsBlinking.length < subdivisions) {
+          newIsBlinking.push(false);
+        }
+        return newIsBlinking;
+      });
       restartSequence();
 
       // const nextQuarterNoteTime = Tone.Transport.nextSubdivision('@4n');

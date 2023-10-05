@@ -8,12 +8,13 @@ type Visibility = "visible" | "hidden";
 
 interface BlinkingSquareProps {
   isBlinking: boolean;
-  setIsBlinking: Dispatch<SetStateAction<boolean>>;
+  // setIsBlinking: Dispatch<SetStateAction<boolean>>;
+  setIsBlinking: (newIsBlinking: boolean) => void;
 }
 
 const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) => {
   const { metronome, setMetronome } = useMetronomeContext();
-  const {blinkToggle} = metronome;
+  const { blinkToggle } = metronome;
 
   const squareStyle = {
     width: "50px",
@@ -27,17 +28,17 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
   if (isBlinking) {
     setTimeout(() => {
       setIsBlinking(false)
-    }, 60); //60
-    // Tone.Draw.schedule(() => setIsBlinking(false), Tone.now() +Tone.Time("32n").toSeconds());
+    }, 60);
   }
+  
   const handleToggleChange = () => {
-    setMetronome({...metronome, blinkToggle: !metronome.blinkToggle});
+    setMetronome({ ...metronome, blinkToggle: !metronome.blinkToggle });
   };
 
 
   return (
     <>
-      <Box display='flex' justifyContent="center" alignItems='center'>
+      {/* <Box display='flex' justifyContent="center" alignItems='center'>
         <Typography>Blink</Typography>
         <Switch
           checked={blinkToggle}
@@ -45,14 +46,14 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
           color="primary"
         />
         <Typography sx={{ minWidth: '4ch' }}>{blinkToggle ? 'On' : 'Off'}</Typography>
-      </Box>
+      </Box> */}
 
-      <Box
+      {/* <Box
         display="flex"
         justifyContent="center"
-      >
+      > */}
         <div id='sq' style={squareStyle} />
-      </Box>
+      {/* </Box> */}
     </>
   )
 };
