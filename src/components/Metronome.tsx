@@ -169,7 +169,7 @@ const Metronome = () => {
     <Box className="metronome">
       <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
       <BlinkToggle />
-      <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+      <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width:'320px' }} mb={1}>
         {isBlinking.map((blinking, index) => (
           //if Downbeat or MonoAll, only render the FIRST Blinker
           (blinkToggle === BlinkToggleOption.All || blinkToggle === BlinkToggleOption.Off ||
@@ -186,35 +186,33 @@ const Metronome = () => {
       </Box>
       <SubdivisionCounter restartSequence={restartSequence} setIsBlinking={setIsBlinking} />
 
-      <Box mt={1} display='flex' alignItems='center' sx={{ width: '250px', }}>
-        <Typography variant="body1" mr={2} sx={{ flexShrink: 0, }} >BPM</Typography>
+      <Box mt={0} display='flex' alignItems='center' sx={{ width: '320px', margin: 'auto' }}>
+        <Typography variant="body1" mr={1} sx={{ width: '50px', flexShrink: 0 }}>BPM</Typography>
         <Slider
           min={20}
           max={256}
           value={bpm}
+          sx={{ width: '220px' }}
           onChange={handleSliderChange}
           onChangeCommitted={handleSliderCommit}
         />
-        <Typography variant="body1" ml={2} sx={{ minWidth: '3ch' }}>{bpm}</Typography>
+        <Typography variant="body1" ml={1} sx={{ width: '50px', flexShrink: 0, minWidth: '3ch' }}>{bpm}</Typography>
       </Box>
 
-      <Grid container spacing={2} alignItems="center"  >
-        <Grid item width={'5ch'}>
+      <Box mt={0} display='flex' alignItems='center' sx={{ width: '320px', margin: 'auto' }}>
+        <Box mr={1} sx={{ width: '50px', flexShrink: 0 }} display='flex' alignItems='center' justifyContent='center'>
           {volume >= 1 ? <VolumeUp /> : <VolumeOffIcon />}
-        </Grid>
-        <Grid item xs>
-          <Slider
-            min={0}
-            max={100}
-            value={volume}
-            onChange={handleVolumeChange}
-            onChangeCommitted={handleVolumeChange}
-          />
-        </Grid>
-        <Grid item width={'5ch'}>
-          {volume}
-        </Grid>
-      </Grid>
+        </Box>
+        <Slider
+          min={0}
+          max={100}
+          sx={{ width: '220px' }}
+          value={volume}
+          onChange={handleVolumeChange}
+          onChangeCommitted={handleVolumeChange}
+        />
+        <Typography variant="body1" ml={1} sx={{ width: '50px', flexShrink: 0, minWidth: '3ch' }}>{volume}</Typography>
+      </Box>
 
       <Button variant='contained' onClick={handleHelp}>Help</Button>
       {/* <Grader /> */}

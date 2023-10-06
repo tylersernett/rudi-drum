@@ -40,13 +40,20 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence
   }, [subdivisions, setIsBlinking,]);
 
   return (
-    <Box mt={2}>
-      <Button variant="outlined" onClick={() => incrementSubdivisions(-1)} disabled={subdivisions === subMin}><RemoveIcon /></Button>
-      <Button variant="outlined" onClick={() => incrementSubdivisions(1)} disabled={subdivisions === subMax}><AddIcon /></Button>
-      <Typography variant="body1">
-        subdivisions: {subdivisions}
-      </Typography>
+    <Box mt={1} display='flex' alignItems='center' sx={{ width: '320px', margin: 'auto' }}>
+      <Typography variant="body1" mr={1} sx={{ width: '50px', flexShrink: 0 }}>Subs</Typography>
+      <Slider
+        value={subdivisions}
+        min={subMin}
+        max={subMax}
+        step={1}
+        sx={{ width: '220px' }}
+        onChange={handleSubdivisionsChange}
+        marks
+      />
+      <Typography variant="body1" ml={1} sx={{ width: '50px', flexShrink: 0, minWidth: '3ch' }}>{subdivisions}</Typography>
     </Box>
+
   );
 };
 

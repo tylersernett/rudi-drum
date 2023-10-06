@@ -19,7 +19,7 @@ const BlinkToggle: React.FC<BlinkToggleProps> = () => {
 
   return (
     <Box mb={2}>
-      <Typography mb={0}>blink type:</Typography>
+      <Typography mb={0.5} variant='body2' >Blink</Typography>
       <ToggleButtonGroup
         value={blinkToggle}
         exclusive
