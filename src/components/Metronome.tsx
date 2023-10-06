@@ -11,11 +11,14 @@ import SubdivisionCounter from "./SubdivisionCounter";
 import PlayPause from "./PlayPause";
 import { useMetronomeContext } from "../context/MetronomeContext";
 import { TimeObject } from "tone/build/esm/core/type/Units";
+import BlinkToggle from "./BlinkToggle";
+import { BlinkToggleOption } from "../types";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
   // const [isBlinking, setIsBlinking] = useState(false);
   const { metronome, setMetronome } = useMetronomeContext();
+  const { blinkToggle } = metronome;
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
   const [volume, setVolume] = useState(100);
@@ -24,17 +27,6 @@ const Metronome = () => {
   const [isBlinking, setIsBlinking] = useState<boolean[]>(() => {
     return Array.from({ length: metronome.subdivisions }, () => false);
   });
-
-  // useEffect(() => {
-  //   setIsBlinking((prevIsBlinking) => {
-  //     // Update the size of isBlinking array when subdivisions change
-  //     const newIsBlinking = [...prevIsBlinking].slice(0, subdivisions);
-  //     while (newIsBlinking.length < subdivisions) {
-  //       newIsBlinking.push(false);
-  //     }
-  //     return newIsBlinking;
-  //   });
-  // }, [subdivisions]);
 
   useEffect(() => {
     sampler.current = new Tone.Sampler({
@@ -64,34 +56,35 @@ const Metronome = () => {
     sequence.current = new Tone.Sequence((time, note) => {
       if (sampler.current) {
         sampler.current.triggerAttackRelease(note, "32n", time);
-        // Tone.Draw.schedule(() => setIsBlinking(true), time); //this will blink EVERY subdivision
-        // console.log('DOWNBEA7: ', time)
+
+        //blink every beat -- MonoAll
+        // Tone.Draw.schedule(() => setIsBlinking(prevIsBlinking => {
+        //   const updatedIsBlinking = [...prevIsBlinking];
+        //   updatedIsBlinking[0] = true;
+        //   return updatedIsBlinking;
+        // }), time); 
       }
     }, [["C4", ...subDivNotes]], "4n").start(restartTime);
 
-    console.log("SEQ: ", sequence.current); //sequence.current.part.events[0]
-
-    // const drawLoop = 
-
     new Tone.Loop((time) => {
+      // for (let i = 0; i < (blinkToggle === BlinkToggleOption.All ? subdivisions : 1); i++) {
       for (let i = 0; i < subdivisions; i++) {
         const prefix = 4 * subdivisions;
         const timeStr = `${prefix}n`;
         //Object, ({"4n" : 3, "8t" : -1}). The resulting time is equal to the sum of all of the keys multiplied by the values in the object.
         const timeObj = { [timeStr]: i } as TimeObject
-        // console.log(Tone.Time(timeObj))
         const timeString = i === 0 ? time : time + Tone.Transport.toSeconds(timeObj)
         Tone.Draw.schedule(() => {
           setIsBlinking(prevIsBlinking => {
+            console.log(prevIsBlinking)
             const updatedIsBlinking = [...prevIsBlinking];
-            updatedIsBlinking[i] = true;
-            // console.log(updatedIsBlinking)
+              updatedIsBlinking[i] = true; // Only update if index already exists - prevent state error
+            console.log(updatedIsBlinking)
             return updatedIsBlinking;
           })
         }, timeString) //use AudioContext time of the event
       }
     }, "4n").start(restartTime)
-
   }
 
   const handleSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
@@ -147,8 +140,6 @@ const Metronome = () => {
     }
   }, []);
 
-
-
   const handleHelp = () => {
     // if (sampler.current) console.log(sampler?.current.volume)
     console.log(isBlinking)
@@ -177,15 +168,20 @@ const Metronome = () => {
   return (
     <Box className="metronome">
       <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
+      <BlinkToggle />
       <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
         {isBlinking.map((blinking, index) => (
-          <Blinker key={index} isBlinking={blinking} setIsBlinking={(newBlinking) => {
-            setIsBlinking((prevIsBlinking) => {
-              const updatedIsBlinking = [...prevIsBlinking];
-              updatedIsBlinking[index] = newBlinking;
-              return updatedIsBlinking;
-            });
-          }} />
+          //if Downbeat or MonoAll, only render the FIRST Blinker
+          (blinkToggle === BlinkToggleOption.All || blinkToggle === BlinkToggleOption.Off ||
+            (blinkToggle === BlinkToggleOption.Downbeat && index === 0) || (blinkToggle === BlinkToggleOption.MonoAll && index === 0)) && (
+            <Blinker key={index} isBlinking={blinking} setIsBlinking={(newBlinking) => {
+              setIsBlinking((prevIsBlinking) => {
+                const updatedIsBlinking = [...prevIsBlinking];
+                updatedIsBlinking[index] = newBlinking;
+                return updatedIsBlinking;
+              });
+            }} />
+          )
         ))}
       </Box>
       <SubdivisionCounter restartSequence={restartSequence} setIsBlinking={setIsBlinking} />

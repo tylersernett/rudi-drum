@@ -3,6 +3,7 @@
 import { Dispatch, SetStateAction, } from "react";
 import { Box, Switch, Typography } from "@mui/material";
 import { useMetronomeContext } from "../context/MetronomeContext";
+import { BlinkToggleOption } from "../types";
 
 type Visibility = "visible" | "hidden";
 
@@ -21,7 +22,7 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
     height: "50px",
     backgroundColor: isBlinking ? "orange" : "lightgray",
     borderRadius: '100%',
-    visibility: blinkToggle ? "visible" : "hidden" as Visibility, // Cast to Visibility
+    visibility: blinkToggle!==BlinkToggleOption.Off ? "visible" : "hidden" as Visibility, // Cast to Visibility
     // transition: "background-color 0.2s ease-in-out",
   };
 
@@ -31,9 +32,9 @@ const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) =
     }, 60);
   }
   
-  const handleToggleChange = () => {
-    setMetronome({ ...metronome, blinkToggle: !metronome.blinkToggle });
-  };
+  // const handleToggleChange = () => {
+  //   setMetronome({ ...metronome, blinkToggle: !metronome.blinkToggle });
+  // };
 
 
   return (

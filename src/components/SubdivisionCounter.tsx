@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -8,7 +8,6 @@ import { useMetronomeContext } from "../context/MetronomeContext";
 interface SubdivisionCounterProps {
   restartSequence: (restartTime?: number) => void;
   setIsBlinking: Dispatch<SetStateAction<boolean[]>>;
-  // sequence: MutableRefObject<Sequence<any> | null>;
 }
 
 const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence, setIsBlinking }) => {
@@ -23,25 +22,25 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence
 
   // Use useEffect to listen for changes in subdivisions
   useEffect(() => {
+    console.log(metronome)
+    setIsBlinking((prevIsBlinking) => {
+      console.log('prev: ', prevIsBlinking)
+      // Update the size of isBlinking array when subdivisions change
+      const newIsBlinking = [...prevIsBlinking].slice(0, subdivisions);
+      while (newIsBlinking.length < subdivisions) {
+        newIsBlinking.push(false);
+      }
+      console.log('new: ', newIsBlinking)
+      return newIsBlinking;
+    });
     if (Tone.Transport.state === "started") {
-      setIsBlinking((prevIsBlinking) => {
-        // Update the size of isBlinking array when subdivisions change
-        const newIsBlinking = [...prevIsBlinking].slice(0, subdivisions);
-        while (newIsBlinking.length < subdivisions) {
-          newIsBlinking.push(false);
-        }
-        return newIsBlinking;
-      });
-      restartSequence();
 
-      // const nextQuarterNoteTime = Tone.Transport.nextSubdivision('@4n');
-      // console.log('Next quarter note time:', nextQuarterNoteTime);
-      // restartSequence(Tone.now() + nextQuarterNoteTime);
+      restartSequence();
     }
-  }, [subdivisions]);
+  }, [subdivisions, setIsBlinking,]);
 
   return (
-    <Box mt={3}>
+    <Box mt={2}>
       <Button variant="outlined" onClick={() => incrementSubdivisions(-1)} disabled={subdivisions === subMin}><RemoveIcon /></Button>
       <Button variant="outlined" onClick={() => incrementSubdivisions(1)} disabled={subdivisions === subMax}><AddIcon /></Button>
       <Typography variant="body1">
