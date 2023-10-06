@@ -78,7 +78,9 @@ const Metronome = () => {
           setIsBlinking(prevIsBlinking => {
             console.log(prevIsBlinking)
             const updatedIsBlinking = [...prevIsBlinking];
+            if (updatedIsBlinking[i] !== undefined) {
               updatedIsBlinking[i] = true; // Only update if index already exists - prevent state error
+            }
             console.log(updatedIsBlinking)
             return updatedIsBlinking;
           })
@@ -177,7 +179,9 @@ const Metronome = () => {
             <Blinker key={index} isBlinking={blinking} setIsBlinking={(newBlinking) => {
               setIsBlinking((prevIsBlinking) => {
                 const updatedIsBlinking = [...prevIsBlinking];
-                updatedIsBlinking[index] = newBlinking;
+                if (updatedIsBlinking[index] !== undefined) {
+                  updatedIsBlinking[index] = newBlinking;
+                }
                 return updatedIsBlinking;
               });
             }} />

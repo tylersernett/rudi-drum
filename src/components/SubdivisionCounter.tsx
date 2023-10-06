@@ -1,7 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, } from "react";
-import { Box, Typography, Button } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { Box, Typography, Slider, Grid } from "@mui/material";
 import * as Tone from 'tone';
 import { useMetronomeContext } from "../context/MetronomeContext";
 
@@ -15,26 +13,19 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence
   const { subdivisions } = metronome;
   const subMin = 1;
   const subMax = 8;
-  const incrementSubdivisions = (val: number): void => {
-    const newValue = Math.min(Math.max(subdivisions + val, subMin), subMax);
-    setMetronome({ ...metronome, subdivisions: newValue });
+
+  const handleSubdivisionsChange = (event: Event, newValue: number | number[]) => {
+    if (typeof newValue === 'number') {
+      const newSubdivisions = Math.min(Math.max(newValue, subMin), subMax);
+      setMetronome({ ...metronome, subdivisions: newSubdivisions });
+    }
   };
 
-  // Use useEffect to listen for changes in subdivisions
+  // Update the size of isBlinking array when subdivisions change
   useEffect(() => {
     console.log(metronome)
-    setIsBlinking((prevIsBlinking) => {
-      console.log('prev: ', prevIsBlinking)
-      // Update the size of isBlinking array when subdivisions change
-      const newIsBlinking = [...prevIsBlinking].slice(0, subdivisions);
-      while (newIsBlinking.length < subdivisions) {
-        newIsBlinking.push(false);
-      }
-      console.log('new: ', newIsBlinking)
-      return newIsBlinking;
-    });
+    setIsBlinking(Array.from({ length: subdivisions }, () => false));
     if (Tone.Transport.state === "started") {
-
       restartSequence();
     }
   }, [subdivisions, setIsBlinking,]);
