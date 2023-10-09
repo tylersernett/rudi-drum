@@ -1,6 +1,6 @@
 import React from "react";
-import { ButtonGroup, Button, ToggleButton, ToggleButtonGroup, Typography, Box } from "@mui/material";
-import { IMetronome, BlinkToggleOption } from "../types"; // Import your types
+import { ToggleButton, ToggleButtonGroup, Typography, Box } from "@mui/material";
+import { BlinkToggleOption } from "../types"; // Import your types
 import { useMetronomeContext } from "../context/MetronomeContext";
 
 interface BlinkToggleProps {
@@ -11,7 +11,7 @@ interface BlinkToggleProps {
 const BlinkToggle: React.FC<BlinkToggleProps> = () => {
   const { metronome, setMetronome } = useMetronomeContext();
   const { blinkToggle, subdivisions } = metronome;
-  const handleToggleChange = (event: React.MouseEvent<HTMLElement>, value: BlinkToggleOption) => {
+  const handleToggleChange = (_event: React.MouseEvent<HTMLElement>, value: BlinkToggleOption) => {
     if (value !== null) {
       setMetronome({ ...metronome, blinkToggle: value });
     }

@@ -10,7 +10,7 @@ interface BlinkingSquareProps {
 }
 
 const Blinker: React.FC<BlinkingSquareProps> = ({ isBlinking, setIsBlinking }) => {
-  const { metronome, setMetronome } = useMetronomeContext();
+  const { metronome } = useMetronomeContext();
   const { blinkToggle } = metronome;
 
   const squareStyle = {

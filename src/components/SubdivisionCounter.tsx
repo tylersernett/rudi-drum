@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { Box, Typography, Slider, Grid } from "@mui/material";
+import { Box, Typography, Slider } from "@mui/material";
 import * as Tone from 'tone';
 import { useMetronomeContext } from "../context/MetronomeContext";
 
@@ -14,7 +14,7 @@ const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence
   const subMin = 1;
   const subMax = 8;
 
-  const handleSubdivisionsChange = (event: Event, newValue: number | number[]) => {
+  const handleSubdivisionsChange = (_event: Event, newValue: number | number[]) => {
     if (typeof newValue === 'number') {
       const newSubdivisions = Math.min(Math.max(newValue, subMin), subMax);
       setMetronome({ ...metronome, subdivisions: newSubdivisions });
