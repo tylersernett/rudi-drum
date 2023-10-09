@@ -142,10 +142,10 @@ const Metronome = () => {
     }
   }, []);
 
-  const handleHelp = () => {
-    // if (sampler.current) console.log(sampler?.current.volume)
-    console.log(isBlinking)
-  }
+  // const handleHelp = () => {
+  //   // if (sampler.current) console.log(sampler?.current.volume)
+  //   console.log(metronome)
+  // }
 
   const handleVolumeChange = (_event: React.SyntheticEvent | Event, value: number | number[]) => {
     if (typeof value === "number") {
@@ -218,7 +218,7 @@ const Metronome = () => {
         <Typography variant="body1" ml={1} sx={{ width: '50px', flexShrink: 0, minWidth: '3ch' }}>{volume}</Typography>
       </Box>
 
-      <Button variant='contained' onClick={handleHelp}>Help</Button>
+      {/* <Button variant='contained' onClick={handleHelp}>Help</Button> */}
       {/* <Grader /> */}
     </Box >
   );
