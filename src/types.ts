@@ -10,11 +10,18 @@ export interface IUser {
 
 export type Direction = 'asc' | 'desc' | undefined;
 
+export enum BlinkToggleOption {
+  Off = "off",
+  Downbeat = "downbeat",
+  All = "all",
+  MonoAll = "mono all",
+}
+
 export interface IMetronome {
   title: string;
   bpm: number;
   subdivisions: number;
-  blinkToggle: boolean;
+  blinkToggle: BlinkToggleOption;
 }
 
 export interface MetronomeDBItem extends IMetronome{

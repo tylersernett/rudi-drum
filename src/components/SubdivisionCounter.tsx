@@ -1,44 +1,50 @@
-import { useEffect } from "react";
-import { Box, Typography, Button } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { Box, Typography, Slider, Grid } from "@mui/material";
 import * as Tone from 'tone';
 import { useMetronomeContext } from "../context/MetronomeContext";
 
 interface SubdivisionCounterProps {
   restartSequence: (restartTime?: number) => void;
-  // sequence: MutableRefObject<Sequence<any> | null>;
+  setIsBlinking: Dispatch<SetStateAction<boolean[]>>;
 }
 
-const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence, }) => {
+const SubdivisionCounter: React.FC<SubdivisionCounterProps> = ({ restartSequence, setIsBlinking }) => {
   const { metronome, setMetronome } = useMetronomeContext();
   const { subdivisions } = metronome;
   const subMin = 1;
   const subMax = 8;
-  const incrementSubdivisions = (val: number): void => {
-    const newValue = Math.min(Math.max(subdivisions + val, subMin), subMax);
-    setMetronome({ ...metronome, subdivisions: newValue });
+
+  const handleSubdivisionsChange = (event: Event, newValue: number | number[]) => {
+    if (typeof newValue === 'number') {
+      const newSubdivisions = Math.min(Math.max(newValue, subMin), subMax);
+      setMetronome({ ...metronome, subdivisions: newSubdivisions });
+    }
   };
 
-  // Use useEffect to listen for changes in subdivisions
+  // Update the size of isBlinking array when subdivisions change
   useEffect(() => {
+    console.log(metronome)
+    setIsBlinking(Array.from({ length: subdivisions }, () => false));
     if (Tone.Transport.state === "started") {
       restartSequence();
-
-      // const nextQuarterNoteTime = Tone.Transport.nextSubdivision('@4n');
-      // console.log('Next quarter note time:', nextQuarterNoteTime);
-      // restartSequence(Tone.now() + nextQuarterNoteTime);
     }
-  }, [subdivisions]);
+  }, [subdivisions, setIsBlinking,]);
 
   return (
-    <Box mt={3}>
-      <Button variant="outlined" onClick={() => incrementSubdivisions(-1)} disabled={subdivisions === subMin}><RemoveIcon /></Button>
-      <Button variant="outlined" onClick={() => incrementSubdivisions(1)} disabled={subdivisions === subMax}><AddIcon /></Button>
-      <Typography variant="body1">
-        subdivisions: {subdivisions}
-      </Typography>
+    <Box mt={1} display='flex' alignItems='center' sx={{ width: '320px', margin: 'auto' }}>
+      <Typography variant="body1" mr={1} sx={{ width: '50px', flexShrink: 0 }}>Subs</Typography>
+      <Slider
+        value={subdivisions}
+        min={subMin}
+        max={subMax}
+        step={1}
+        sx={{ width: '220px' }}
+        onChange={handleSubdivisionsChange}
+        marks
+      />
+      <Typography variant="body1" ml={1} sx={{ width: '50px', flexShrink: 0, minWidth: '3ch' }}>{subdivisions}</Typography>
     </Box>
+
   );
 };
 

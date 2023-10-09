@@ -1,6 +1,5 @@
 import { ReactNode, createContext, useContext, useState, Dispatch, SetStateAction } from "react";
-import { IMetronome, } from "../types";
-
+import { IMetronome, BlinkToggleOption} from "../types";
 
 type MetronomeContextType = {
   metronome: IMetronome,
@@ -14,7 +13,7 @@ const initialMetronomeState = {
   title: '',
   bpm: 120,
   subdivisions: 1,
-  blinkToggle: true,
+  blinkToggle: BlinkToggleOption.Downbeat,
 };
 
 export const useMetronomeContext = () => {
