@@ -54,10 +54,8 @@ const remove = async (id: number, token: string) => {
       Authorization: `Bearer ${token}`,
     };
 
-    // Send a DELETE request to the backend API
     await axios.delete(`${API_URL}/metronomes/${id}`, { headers });
 
-    // The server will respond with a 204 status code if successful
   } catch (error) {
     console.error('Error deleting metronome:', error);
     throw error;
