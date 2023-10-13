@@ -6,8 +6,7 @@ This is the frontend repo. View backend code [here](https://github.com/tylersern
 ## Description
 Metronomes are essential tools for timing and rhythm practice. However, it can become tedious queuing up and tweaking different patterns for multiple drills. Rudi fixes this hassle by allowing the user to save and load customized metronome patterns.
 
-<!-- ![Rudi screenshot](/readme/rudi.png) -->
-<img src="./readme/rudi.png" alt="drawing" height="400"/>
+<img src="./readme/rudi.png" alt="rudi screenshot" height="400"/>
 
 
 ## How It's Made:
