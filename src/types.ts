@@ -17,9 +17,17 @@ export enum BlinkToggleOption {
   MonoAll = "mono all",
 }
 
+export enum RampToggleOption {
+  Off = "off",
+  On = "on",
+}
+
 export interface IMetronome {
   title: string;
   bpm: number;
+  rampToBpm: number;
+  rampToggle: RampToggleOption;
+  rampDuration: number;
   subdivisions: number;
   blinkToggle: BlinkToggleOption;
 }
