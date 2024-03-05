@@ -2,7 +2,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import metronomeServices from '../../services/metronomes'; // Replace with the actual module path
 import { API_URL } from '../../../config';
-import { BlinkToggleOption, IMetronome, MetronomeDBItem } from '../../types';
+import { BlinkToggleOption, RampToggleOption, IMetronome, MetronomeDBItem } from '../../types';
 import { MockAuthService } from './MockAuthService'; // Adjust the path to match your project structure
 
 const { create, getOwn, update, remove } = metronomeServices
@@ -13,6 +13,9 @@ const metronome: IMetronome = {
   bpm: 222,
   subdivisions: 3,
   blinkToggle: BlinkToggleOption.Off,
+  rampToBpm: 120,
+  rampDuration: 0,
+  rampToggle: RampToggleOption.Off,
 };
 const metronomeItem: MetronomeDBItem = {
   ...metronome,
