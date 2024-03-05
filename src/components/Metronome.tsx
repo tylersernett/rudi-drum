@@ -19,17 +19,20 @@ import { BlinkToggleOption, RampToggleOption } from "../types";
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isRamping, setIsRamping] = useState(false);
   const { metronome, setMetronome } = useMetronomeContext();
   const { blinkToggle } = metronome;
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
   const [volume, setVolume] = useState(100);
 
-  const { bpm, subdivisions, rampToBpm, rampToggle, rampDuration } = metronome;
+  const { title, bpm, subdivisions, rampToBpm, rampToggle, rampDuration } = metronome;
+  const [defaultBpm, setDefaultBpm] = useState(bpm);
   const [isBlinking, setIsBlinking] = useState<boolean[]>(() => {
     return Array.from({ length: metronome.subdivisions }, () => false);
   });
 
+  //initialize sampler sounds
   useEffect(() => {
     sampler.current = new Tone.Sampler({
       urls: {
@@ -38,24 +41,49 @@ const Metronome = () => {
       },
       onload: () => {
         setLoaded(true);
-        Tone.Transport.bpm.value = bpm
+        // Tone.Transport.bpm.value = bpm
       }
     }).toDestination();
 
     // restartSequence();
   }, [])
 
-  //update tempo on bpm change (needed when bpm changes from a load or other non-slider input)
-  // useEffect(() => {
-  //   Tone.Transport.bpm.value = bpm
-  // }, [bpm])
-
+  //restart sequence whenever new pattern is loaded (when the title changes)
   useEffect(() => {
-    // setMetronome({
-    //   ...metronome,
-    //   bpm: Math.round( Tone.Transport.bpm.value),
-    // });
-    if (rampToggle) {
+    //console.log('title reset')
+    Tone.Transport.bpm.value = bpm
+    setDefaultBpm(bpm)
+    restartSequence();
+  }, [title])
+
+  //update BPM slider during ramp
+  /*
+  useEffect(() => {
+    if (rampToggle && isRamping) {
+      let intervalId: number | undefined = undefined;
+      if (isPlaying) {
+        intervalId = setInterval(() => {
+          const roundedBpm = Math.round(Tone.Transport.bpm.value)
+          setMetronome({
+            ...metronome,
+            bpm: roundedBpm,
+          });
+          if (roundedBpm === rampToBpm) {
+            setIsRamping(false);
+          }
+        }, 50); // Update every 50 milliseconds to avoid 'maximum depth exceeded' error
+        return () => clearInterval(intervalId); // Cleanup function to clear the timeout
+      } else {
+        // setIsRamping(false);
+        // Tone.Transport.cancel();
+        // Tone.Transport.bpm.value = defaultBpm
+      }
+    }
+  }, [Tone.Transport.bpm.value])
+  */
+  useEffect(() => {
+    if (rampToggle === RampToggleOption.On) {
+      // console.log(defaultBpm)
       const timeoutId = setTimeout(() => {
         setMetronome({
           ...metronome,
@@ -66,10 +94,24 @@ const Metronome = () => {
     }
   }, [Tone.Transport.bpm.value])
 
+  //start the ramp
+  useEffect(() => {
+    if (isPlaying) {
+      //console.log(rampDuration)
+      if (rampDuration > 0 && rampToggle === RampToggleOption.On) {
+        Tone.Transport.bpm.rampTo(rampToBpm, rampDuration);
+      }
+    } else {
+      Tone.Transport.cancel(); //stop the rampTo
+      Tone.Transport.bpm.value = defaultBpm; //reset bpm to starting value 
+      // Tone.Transport.bpm.value = bpm; //reset bpm to most recent value 
+    }
+  }, [isPlaying])
+
   const restartSequence = (restartTime = 0) => {
     Tone.Transport.cancel();
     Tone.Draw.cancel();
-    console.log("subs:", subdivisions, "arrLen: ", isBlinking.length)
+    // console.log("subs:", subdivisions, "arrLen: ", isBlinking.length)
     const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3"); //the notes NOT on the downbeat
     sequence.current = new Tone.Sequence((time, note) => {
       if (sampler.current) {
@@ -94,22 +136,20 @@ const Metronome = () => {
         const timeString = i === 0 ? time : time + Tone.Transport.toSeconds(timeObj)
         Tone.Draw.schedule(() => {
           setIsBlinking(prevIsBlinking => {
-            console.log(prevIsBlinking)
+            // console.log(prevIsBlinking)
             const updatedIsBlinking = [...prevIsBlinking];
             if (updatedIsBlinking[i] !== undefined) {
               updatedIsBlinking[i] = true; // Only update if index already exists - prevent state error
             }
-            console.log(updatedIsBlinking)
+            // console.log(updatedIsBlinking)
             return updatedIsBlinking;
           })
         }, timeString) //use AudioContext time of the event
       }
     }, "4n").start(restartTime)
-    if (rampDuration > 0 && rampToggle === RampToggleOption.On ) {
-      Tone.Transport.bpm.rampTo(rampToBpm, rampDuration);
-    }
   }
 
+  //BPM SLIDER \\\\
   const handleSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
     processSliderValue(newValue, (newBpm) => {
       setMetronome({
@@ -130,10 +170,12 @@ const Metronome = () => {
     if (typeof value === 'number') {
       updateState(value);
       Tone.Transport.bpm.value = value
+      setDefaultBpm(value)
     } else {
       console.warn('Unexpected value:', value);
     }
   };
+  ////\\\\\\\
 
   const handleRampSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
     // processSliderValue(newValue, (newBpm) => {
@@ -154,7 +196,7 @@ const Metronome = () => {
       try {
         await Tone.start();
         console.log('audio is ready');
-        console.log(Tone.getTransport());
+        //console.log(Tone.getTransport());
       } catch (error) {
         console.error('Error starting audio:', error);
       }
