@@ -2,7 +2,7 @@ import { expect, } from 'vitest';
 import { render, screen, fireEvent, } from '@testing-library/react';
 import '@testing-library/jest-dom'; // No need to explicitly extend expect
 import BrowseDialog from '../../../components/MainMenu/BrowseDialog'; // Import your component
-import { BlinkToggleOption, MetronomeDBItem } from '../../../types';
+import { BlinkToggleOption, MetronomeDBItem, RampToggleOption } from '../../../types';
 import { UserProvider } from '../../../context/UserContext';
 import { MetronomeProvider } from '../../../context/MetronomeContext';
 
@@ -16,6 +16,9 @@ describe('BrowseDialog Component', () => {
         bpm: 120,
         subdivisions: 3,
         blinkToggle: BlinkToggleOption.Off,
+        rampToBpm: 120,
+        rampDuration: 0,
+        rampToggle: RampToggleOption.Off,
         id: 123,
         createdAt: '1000',
         updatedAt: '1000',
@@ -26,6 +29,9 @@ describe('BrowseDialog Component', () => {
         bpm: 100,
         subdivisions: 4,
         blinkToggle: BlinkToggleOption.Off,
+        rampToBpm: 120,
+        rampDuration: 0,
+        rampToggle: RampToggleOption.Off,
         id: 124,
         createdAt: '1002',
         updatedAt: '1002',
@@ -36,6 +42,9 @@ describe('BrowseDialog Component', () => {
         bpm: 150,
         subdivisions: 6,
         blinkToggle: BlinkToggleOption.Off,
+        rampToBpm: 120,
+        rampDuration: 0,
+        rampToggle: RampToggleOption.Off,
         id: 125,
         createdAt: '1003',
         updatedAt: '1003',
