@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, } from "react";
-import { Box, Slider, Typography } from "@mui/material";
+import { Box, Grid, Slider, Typography } from "@mui/material";
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import * as Tone from 'tone';
@@ -12,22 +12,27 @@ import PlayPause from "./PlayPause";
 import { useMetronomeContext } from "../context/MetronomeContext";
 import { TimeObject } from "tone/build/esm/core/type/Units";
 import BlinkToggle from "./BlinkToggle";
-import { BlinkToggleOption } from "../types";
+import RampToggle from "./RampToggle";
+import MuiInput from '@mui/material/Input';
+import { BlinkToggleOption, RampToggleOption } from "../types";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
-  // const [isBlinking, setIsBlinking] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  // const [isRamping, setIsRamping] = useState(false);
   const { metronome, setMetronome } = useMetronomeContext();
   const { blinkToggle } = metronome;
   const sampler = useRef<Tone.Sampler | null>(null);
   const sequence = useRef<Tone.Sequence | null>(null);
   const [volume, setVolume] = useState(100);
 
-  const { bpm, subdivisions } = metronome;
+  const { title, bpm, subdivisions, rampToBpm, rampToggle, rampDuration } = metronome;
+  const [defaultBpm, setDefaultBpm] = useState(bpm);
   const [isBlinking, setIsBlinking] = useState<boolean[]>(() => {
     return Array.from({ length: metronome.subdivisions }, () => false);
   });
 
+  //initialize sampler sounds
   useEffect(() => {
     sampler.current = new Tone.Sampler({
       urls: {
@@ -36,22 +41,77 @@ const Metronome = () => {
       },
       onload: () => {
         setLoaded(true);
-        Tone.Transport.bpm.value = bpm
+        // Tone.Transport.bpm.value = bpm
       }
     }).toDestination();
 
     // restartSequence();
   }, [])
 
-  //update tempo on bpm change (needed when bpm changes from a load or other non-slider input)
+  //restart sequence whenever new pattern is loaded (when the title changes)
   useEffect(() => {
+    //console.log('title reset')
     Tone.Transport.bpm.value = bpm
-  }, [bpm])
+    setDefaultBpm(bpm)
+    restartSequence();
+  }, [title])
+
+  //update BPM slider during ramp
+  /*
+  useEffect(() => {
+    if (rampToggle && isRamping) {
+      let intervalId: number | undefined = undefined;
+      if (isPlaying) {
+        intervalId = setInterval(() => {
+          const roundedBpm = Math.round(Tone.Transport.bpm.value)
+          setMetronome({
+            ...metronome,
+            bpm: roundedBpm,
+          });
+          if (roundedBpm === rampToBpm) {
+            setIsRamping(false);
+          }
+        }, 50); // Update every 50 milliseconds to avoid 'maximum depth exceeded' error
+        return () => clearInterval(intervalId); // Cleanup function to clear the timeout
+      } else {
+        // setIsRamping(false);
+        // Tone.Transport.cancel();
+        // Tone.Transport.bpm.value = defaultBpm
+      }
+    }
+  }, [Tone.Transport.bpm.value])
+  */
+  useEffect(() => {
+    if (rampToggle === RampToggleOption.On) {
+      // console.log(defaultBpm)
+      const timeoutId = setTimeout(() => {
+        setMetronome({
+          ...metronome,
+          bpm: Math.round(Tone.Transport.bpm.value),
+        });
+      }, 50); // Update every 50 milliseconds to avoid 'maximum depth exceeded' error
+      return () => clearTimeout(timeoutId); // Cleanup function to clear the timeout
+    }
+  }, [Tone.Transport.bpm.value])
+
+  //start the ramp
+  useEffect(() => {
+    if (isPlaying) {
+      //console.log(rampDuration)
+      if (rampDuration > 0 && rampToggle === RampToggleOption.On) {
+        Tone.Transport.bpm.rampTo(rampToBpm, rampDuration);
+      }
+    } else {
+      Tone.Transport.cancel(); //stop the rampTo
+      Tone.Transport.bpm.value = defaultBpm; //reset bpm to starting value 
+      // Tone.Transport.bpm.value = bpm; //reset bpm to most recent value 
+    }
+  }, [isPlaying])
 
   const restartSequence = (restartTime = 0) => {
     Tone.Transport.cancel();
     Tone.Draw.cancel();
-    console.log("subs:", subdivisions, "arrLen: ", isBlinking.length)
+    // console.log("subs:", subdivisions, "arrLen: ", isBlinking.length)
     const subDivNotes = Array.from({ length: subdivisions - 1 }, () => "C3"); //the notes NOT on the downbeat
     sequence.current = new Tone.Sequence((time, note) => {
       if (sampler.current) {
@@ -76,12 +136,12 @@ const Metronome = () => {
         const timeString = i === 0 ? time : time + Tone.Transport.toSeconds(timeObj)
         Tone.Draw.schedule(() => {
           setIsBlinking(prevIsBlinking => {
-            console.log(prevIsBlinking)
+            // console.log(prevIsBlinking)
             const updatedIsBlinking = [...prevIsBlinking];
             if (updatedIsBlinking[i] !== undefined) {
               updatedIsBlinking[i] = true; // Only update if index already exists - prevent state error
             }
-            console.log(updatedIsBlinking)
+            // console.log(updatedIsBlinking)
             return updatedIsBlinking;
           })
         }, timeString) //use AudioContext time of the event
@@ -89,6 +149,7 @@ const Metronome = () => {
     }, "4n").start(restartTime)
   }
 
+  //BPM SLIDER \\\\
   const handleSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
     processSliderValue(newValue, (newBpm) => {
       setMetronome({
@@ -109,9 +170,23 @@ const Metronome = () => {
     if (typeof value === 'number') {
       updateState(value);
       Tone.Transport.bpm.value = value
+      setDefaultBpm(value)
     } else {
       console.warn('Unexpected value:', value);
     }
+  };
+  ////\\\\\\\
+
+  const handleRampSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
+    // processSliderValue(newValue, (newBpm) => {
+    if (typeof newValue === 'number') {
+      // updateState(value);
+      setMetronome({
+        ...metronome,
+        rampToBpm: newValue,
+      });
+    }
+    // });
   };
 
   useEffect(() => {
@@ -121,7 +196,7 @@ const Metronome = () => {
       try {
         await Tone.start();
         console.log('audio is ready');
-        console.log(Tone.getTransport());
+        //console.log(Tone.getTransport());
       } catch (error) {
         console.error('Error starting audio:', error);
       }
@@ -167,11 +242,18 @@ const Metronome = () => {
     return -30 + (value / 100) * 30;
   };
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMetronome({
+      ...metronome,
+      rampDuration: parseInt(event.target.value) || 0,
+    });
+  };
+
   return (
     <Box className="metronome">
-      <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
+      <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
       <BlinkToggle />
-      <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width:'320px' }} mb={1}>
+      <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '320px' }} mb={1}>
         {isBlinking.map((blinking, index) => (
           //if Downbeat or MonoAll, only render the FIRST Blinker
           (blinkToggle === BlinkToggleOption.All || blinkToggle === BlinkToggleOption.Off ||
@@ -201,6 +283,55 @@ const Metronome = () => {
           onChangeCommitted={handleSliderCommit}
         />
         <Typography variant="body1" ml={1} sx={{ width: '50px', flexShrink: 0, minWidth: '3ch' }}>{bpm}</Typography>
+      </Box>
+
+      <RampToggle />
+
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          Ramp Duration (seconds)
+        </Grid>
+        <Grid item xs>
+          {/* <Slider
+            // value={typeof value === 'number' ? value : 0}
+            // onChange={handleSliderChange}
+            aria-labelledby="input-slider"
+          /> */}
+        </Grid>
+
+        <Grid item>
+          <MuiInput
+            value={rampDuration}
+            size="small"
+            onChange={handleInputChange}
+            // fullWidth
+
+            // onBlur={handleBlur}
+            inputProps={{
+              step: 1,
+              min: 0,
+              max: 1000,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+              style: { textAlign: 'right' }
+
+            }}
+            sx={{ textAlign: 'left' }}
+          />
+        </Grid>
+      </Grid>
+
+      <Box mt={0} display='flex' alignItems='center' sx={{ width: '320px', margin: 'auto' }}>
+        <Typography variant="body1" mr={1} sx={{ width: '50px', flexShrink: 0 }}>Ramp</Typography>
+        <Slider
+          min={20}
+          max={256}
+          value={rampToBpm}
+          sx={{ width: '220px' }}
+          onChange={handleRampSliderChange}
+          onChangeCommitted={handleRampSliderChange}
+        />
+        <Typography variant="body1" ml={1} sx={{ width: '50px', flexShrink: 0, minWidth: '3ch' }}>{rampToBpm}</Typography>
       </Box>
 
       <Box mt={0} display='flex' alignItems='center' sx={{ width: '320px', margin: 'auto' }}>
