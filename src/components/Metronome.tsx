@@ -18,7 +18,7 @@ import { BlinkToggleOption, RampToggleOption } from "../types";
 
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
-  // const [isBlinking, setIsBlinking] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const { metronome, setMetronome } = useMetronomeContext();
   const { blinkToggle } = metronome;
   const sampler = useRef<Tone.Sampler | null>(null);
@@ -209,7 +209,7 @@ const Metronome = () => {
 
   return (
     <Box className="metronome">
-      <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} />
+      <PlayPause restartSequence={restartSequence} isLoaded={isLoaded} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
       <BlinkToggle />
       <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '320px' }} mb={1}>
         {isBlinking.map((blinking, index) => (

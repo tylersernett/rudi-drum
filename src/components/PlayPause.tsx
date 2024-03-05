@@ -1,4 +1,4 @@
-import { useState, } from "react";
+import { Dispatch, SetStateAction, useState, } from "react";
 import { Box, Button } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -7,10 +7,11 @@ import * as Tone from 'tone';
 interface PlayPauseProps {
   restartSequence: (restartTime?: number) => void;
   isLoaded: boolean;
+  isPlaying: boolean;
+  setIsPlaying: Dispatch<SetStateAction<boolean>>;
 }
 
-const PlayPause: React.FC<PlayPauseProps> = ({ restartSequence, isLoaded }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+const PlayPause: React.FC<PlayPauseProps> = ({ restartSequence, isLoaded, isPlaying, setIsPlaying }) => {
 
   const handlePlayClick = () => {
     if (!isPlaying) {
