@@ -32,8 +32,8 @@ const BrowseDialog: React.FC<BrowseDialogProps> = ({ open, onClose, metronomeDat
 
   const handleLoad = (metronomeItem: MetronomeDBItem) => {
     console.log('Clicked on row, metronome data:', metronomeItem);
-    const { title, bpm, subdivisions, blinkToggle } = metronomeItem;
-    setMetronome({ title, bpm, subdivisions, blinkToggle });
+    const { title, bpm, subdivisions, blinkToggle, rampDuration, rampToBpm, rampToggle } = metronomeItem;
+    setMetronome({ title, bpm, subdivisions, blinkToggle, rampDuration, rampToBpm, rampToggle });
     onClose(); //000 could be a settings switch? "autoclosemenu"
   };
 
