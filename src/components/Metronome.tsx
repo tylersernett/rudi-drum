@@ -19,7 +19,7 @@ import { BlinkToggleOption, RampToggleOption } from "../types";
 const Metronome = () => {
   const [isLoaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isRamping, setIsRamping] = useState(false);
+  // const [isRamping, setIsRamping] = useState(false);
   const { metronome, setMetronome } = useMetronomeContext();
   const { blinkToggle } = metronome;
   const sampler = useRef<Tone.Sampler | null>(null);
