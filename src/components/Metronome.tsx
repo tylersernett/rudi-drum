@@ -44,7 +44,6 @@ const Metronome = () => {
         // Tone.Transport.bpm.value = bpm
       }
     }).toDestination();
-
     // restartSequence();
   }, [])
 
@@ -57,30 +56,6 @@ const Metronome = () => {
   }, [title])
 
   //update BPM slider during ramp
-  /*
-  useEffect(() => {
-    if (rampToggle && isRamping) {
-      let intervalId: number | undefined = undefined;
-      if (isPlaying) {
-        intervalId = setInterval(() => {
-          const roundedBpm = Math.round(Tone.Transport.bpm.value)
-          setMetronome({
-            ...metronome,
-            bpm: roundedBpm,
-          });
-          if (roundedBpm === rampToBpm) {
-            setIsRamping(false);
-          }
-        }, 50); // Update every 50 milliseconds to avoid 'maximum depth exceeded' error
-        return () => clearInterval(intervalId); // Cleanup function to clear the timeout
-      } else {
-        // setIsRamping(false);
-        // Tone.Transport.cancel();
-        // Tone.Transport.bpm.value = defaultBpm
-      }
-    }
-  }, [Tone.Transport.bpm.value])
-  */
   useEffect(() => {
     if (rampToggle === RampToggleOption.On) {
       // console.log(defaultBpm)
@@ -104,7 +79,7 @@ const Metronome = () => {
     } else {
       Tone.Transport.cancel(); //stop the rampTo
       Tone.Transport.bpm.value = defaultBpm; //reset bpm to starting value 
-      // Tone.Transport.bpm.value = bpm; //reset bpm to most recent value 
+      // Tone.Transport.bpm.value = bpm; //reset bpm to most recent value  //999 could be custom setting?
     }
   }, [isPlaying])
 
@@ -116,13 +91,6 @@ const Metronome = () => {
     sequence.current = new Tone.Sequence((time, note) => {
       if (sampler.current) {
         sampler.current.triggerAttackRelease(note, "32n", time);
-
-        //blink every beat -- MonoAll
-        // Tone.Draw.schedule(() => setIsBlinking(prevIsBlinking => {
-        //   const updatedIsBlinking = [...prevIsBlinking];
-        //   updatedIsBlinking[0] = true;
-        //   return updatedIsBlinking;
-        // }), time); 
       }
     }, [["C4", ...subDivNotes]], "4n").start(restartTime);
 
@@ -178,15 +146,12 @@ const Metronome = () => {
   ////\\\\\\\
 
   const handleRampSliderChange = (_event: React.SyntheticEvent | Event, newValue: number | number[]) => {
-    // processSliderValue(newValue, (newBpm) => {
     if (typeof newValue === 'number') {
-      // updateState(value);
       setMetronome({
         ...metronome,
         rampToBpm: newValue,
       });
     }
-    // });
   };
 
   useEffect(() => {
@@ -217,6 +182,7 @@ const Metronome = () => {
     }
   }, []);
 
+  //for debugging:
   // const handleHelp = () => {
   //   // if (sampler.current) console.log(sampler?.current.volume)
   //   console.log(metronome)
@@ -292,11 +258,6 @@ const Metronome = () => {
           Ramp Duration (seconds)
         </Grid>
         <Grid item xs>
-          {/* <Slider
-            // value={typeof value === 'number' ? value : 0}
-            // onChange={handleSliderChange}
-            aria-labelledby="input-slider"
-          /> */}
         </Grid>
 
         <Grid item>
@@ -304,9 +265,6 @@ const Metronome = () => {
             value={rampDuration}
             size="small"
             onChange={handleInputChange}
-            // fullWidth
-
-            // onBlur={handleBlur}
             inputProps={{
               step: 1,
               min: 0,
